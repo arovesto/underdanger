@@ -1,71 +1,70 @@
-import unittest
-
 from board import create_board
 from player import Player
 from world import World
 
-class WorldTest(unittest.TestCase):
-    def test_add(self):
-        w = World()
-        p = Player('Petrovich')
-        self.assertEqual(len(w.mobs), 0)
-        w.add(p, (100, 121))
-        self.assertEqual(len(w.mobs), 1)
-        self.assertEqual(p.position, (100, 121))
-        self.assertEqual(p.world, w)
-        self.assertEqual(w.mobs[(100, 121)], p)
-        
-    def test_can_move(self):
-        w = World()
-        p = Player('Petr')
-        w.add(p, (0, 0))
-        w.add_board(create_board([".#e"]))        
-        
-        self.assertFalse(w.can_move(p, (-5, 1)))
-        self.assertFalse(w.can_move(p, (15, 1)))
 
-        self.assertFalse(w.can_move(p, (0, 1)))
-        self.assertTrue(w.can_move(p, (0, 2)))
-        
-    def test_create_player(self):
-        w = World()
-        w.add_board(create_board(["...", "...", "..."]))        
+def test_add():
+    w = World()
+    p = Player('Petrovich')
+    assert len(w.mobs) == 0
+    w.add(p, (100, 121))
+    assert len(w.mobs) == 1
+    assert p.position == (100, 121)
+    assert p.world == w
+    assert w.mobs[(100, 121)] == p
 
-        p = w.create_player((0, 0), 'Medium fighter', "Vasya")
-        self.assertEqual(p.name, "Vasya")
-        self.assertEqual(p.position, (0, 0))
-        self.assertEqual(w.mobs[(0, 0)], p)
-        
-        self.assertEqual(p.world, w)
-        self.assertEqual(p.position, (0, 0))
 
-        p2 = w.create_player((2, 2), 'Medium fighter', "Petya")
-        self.assertEqual(w.mobs[(0, 0)], p)
-        self.assertEqual(w.mobs[(2, 2)], p2)
+def test_can_move():
+    w = World()
+    p = Player('Petr')
+    w.add(p, (0, 0))
+    w.add_board(create_board([".#e"]), exits=None)
 
-    def test_is_occupied(self):
-        w = World()
-        w.add_board(create_board(["...."]))        
+    assert not w.can_move(p, (-5, 1))
+    assert not w.can_move(p, (15, 1))
 
-        w.create_warrior((0, 1))
-        w.create_archer((0, 2))
-        w.create_player((0, 3), 'Medium fighter', "Vasya")
-        self.assertFalse(w.is_occupied((0, 0)))
-        self.assertTrue(w.is_occupied((0, 1)))
-        self.assertTrue(w.is_occupied((0, 2)))
-        self.assertTrue(w.is_occupied((0, 3)))
-        
-    def test_has_player_at(self):
-        w = World()
-        w.add_board(create_board(["...."]))        
+    assert not w.can_move(p, (0, 1))
+    assert w.can_move(p, (0, 2))
 
-        self.assertIsNotNone(w.has_player_at((0, 0)))
-        self.assertFalse(w.has_player_at((0, 0)))
-        self.assertFalse(w.has_player_at((0, 1)))
 
-        w.create_player((0, 0), 'Medium fighter', "Vasya")
-        self.assertTrue(w.has_player_at((0, 0)))
-        self.assertFalse(w.has_player_at((0, 1)))            
+def test_create_player():
+    w = World()
+    w.add_board(create_board(["...", "...", "..."]), exits=None)
 
-if __name__ == '__main__':
-    unittest.main()
+    p = w.create_player((0, 0), 'рыцарь', "Vasya")
+    assert p.name == "Vasya"
+    assert p.position == (0, 0)
+    assert w.mobs[(0, 0)] == p
+
+    assert p.world == w
+    assert p.position == (0, 0)
+
+    p2 = w.create_player((2, 2), 'рыцарь', "Petya")
+    assert w.mobs[(0, 0)] == p
+    assert w.mobs[(2, 2)] == p2
+
+
+def test_is_occupied():
+    w = World()
+    w.add_board(create_board(["...."]), exits=None)
+
+    w.create_warrior((0, 1))
+    w.create_archer((0, 2))
+    w.create_player((0, 3), 'рыцарь', "Vasya")
+    assert not w.is_occupied((0, 0))
+    assert w.is_occupied((0, 1))
+    assert w.is_occupied((0, 2))
+    assert w.is_occupied((0, 3))
+
+
+def test_has_player_at():
+    w = World()
+    w.add_board(create_board(["...."]), exits=None)
+
+    assert w.has_player_at((0, 0)) is not None
+    assert not w.has_player_at((0, 0))
+    assert not w.has_player_at((0, 1))
+
+    w.create_player((0, 0), 'рыцарь', "Vasya")
+    assert w.has_player_at((0, 0))
+    assert not w.has_player_at((0, 1))
