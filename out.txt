@@ -1,0 +1,79 @@
+============================= test session starts =============================
+platform win32 -- Python 3.6.9, pytest-5.3.2, py-1.8.0, pluggy-0.13.1
+rootdir: D:\home\python_workshop
+plugins: hypothesis-4.54.2, arraydiff-0.3, astropy-header-0.1.1, doctestplus-0.5.0, openfiles-0.4.0, remotedata-0.3.2
+collected 0 items / 10 errors
+
+=================================== ERRORS ====================================
+________ ERROR collecting game-github/underdanger/tests/archer_test.py ________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\archer_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\archer_test.py:1: in <module>
+    from src.mobile.npc.mobs.archer import Archer
+E   ModuleNotFoundError: No module named 'src.mobile'; 'code' is not a package
+________ ERROR collecting game-github/underdanger/tests/board_test.py _________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\board_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\board_test.py:3: in <module>
+    from world.board.board import BoardGenerator, create_board, create_figure, Rectangle, rotate
+E   ModuleNotFoundError: No module named 'world'
+______ ERROR collecting game-github/underdanger/tests/direction_test.py _______
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\direction_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\direction_test.py:1: in <module>
+    from src.geometry.direction import UP
+E   ModuleNotFoundError: No module named 'src'
+_________ ERROR collecting game-github/underdanger/tests/game_test.py _________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\game_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\game_test.py:1: in <module>
+    from game import Game
+E   ModuleNotFoundError: No module named 'game'
+_______ ERROR collecting game-github/underdanger/tests/geometry_test.py _______
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\geometry_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\geometry_test.py:1: in <module>
+    from src.geometry.geometry import distance, add, manhattan, in_square, square, merge
+E   ModuleNotFoundError: No module named 'src.geometry'; 'code' is not a package
+________ ERROR collecting game-github/underdanger/tests/items_test.py _________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\items_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\items_test.py:1: in <module>
+    from src.mobile.npc.player.player import Player
+E   ModuleNotFoundError: No module named 'src'
+_______ ERROR collecting game-github/underdanger/tests/merchant_test.py _______
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\merchant_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\merchant_test.py:3: in <module>
+    from src.mobile.npc.mobs.merchant import Merchant
+E   ModuleNotFoundError: No module named 'src.mobile'; 'code' is not a package
+____ ERROR collecting game-github/underdanger/tests/mobile_object_test.py _____
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\mobile_object_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\mobile_object_test.py:1: in <module>
+    from src.mobile.mobile_object import MobileObject
+E   ModuleNotFoundError: No module named 'src.mobile'; 'code' is not a package
+________ ERROR collecting game-github/underdanger/tests/player_test.py ________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\player_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\player_test.py:1: in <module>
+    from src.mobile.npc.player.player import Player
+E   ModuleNotFoundError: No module named 'src.mobile'; 'code' is not a package
+________ ERROR collecting game-github/underdanger/tests/world_test.py _________
+ImportError while importing test module 'D:\home\python_workshop\game-github\underdanger\tests\world_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests\world_test.py:1: in <module>
+    from src.game.world.board.board import create_board
+E   ModuleNotFoundError: No module named 'src.game'; 'code' is not a package
+!!!!!!!!!!!!!!!!!! Interrupted: 10 errors during collection !!!!!!!!!!!!!!!!!!!
+============================= 10 errors in 0.19s ==============================
