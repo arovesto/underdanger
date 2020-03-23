@@ -24,26 +24,32 @@ def get_action(player):
     else:
         return action
 
+
 def write_map(game):
     with open('!карта.txt', 'w', encoding='utf-8') as file:
         file.write(game.world.all_map())
 
+
 def save_game(game):
     with open("game.dump", "wb") as f:
         pickle.dump(game, f)
+
 
 def load_game():
     with open("game.dump", "rb") as f:
         game = pickle.load(f, encoding="utf-8")
     return game
 
+
 def create_game(shape):
     start_of_game()
     names, classes = get_players_info()
     return Game(names, classes, shape)
 
+
 def is_save_file():
     return os.path.isfile(os.getcwd() + os.sep + "game.dump")
+
 
 def menu_choice(shape):
     if not is_save_file():
@@ -65,7 +71,7 @@ def run_random_game(shape):
         game.run_checks()
         show_happends(game)
         if game.who_action == 'игрок':
-            action = get_action(game.action_player) 
+            action = get_action(game.action_player)
             if action is None:
                 print("Выхожу...")
                 save_game(game)
@@ -80,5 +86,6 @@ def run_random_game(shape):
     else:
         time.sleep(3)
     return
+
 
 run_random_game((500, 500))

@@ -3,6 +3,8 @@ from src.mobile.npc.player.player import Player
 from src.game.world.world import World
 
 
+
+
 def test_add():
     w = World()
     p = Player('Petrovich')
