@@ -10,10 +10,9 @@ def test_show_items():
     assert m.show_items()[0:16] == 'торговец продает'
 
 
-def test_sold():
+def test_sold(player):
     random.seed(44)
     m = Merchant().start_equip()
-    p = Player('Petyka')
-    c = m.sold(p, 'обычное восстановление')
-    assert p.inventory[0].name == normal_heal_potion().name
-    assert c[:-3] == 'Petyka покупает обычное восстановление за'
+    c = m.sold(player, 'обычное восстановление')
+    assert player.inventory[0].name == normal_heal_potion().name
+    assert c[:-3] == player.name + ' покупает обычное восстановление за'
