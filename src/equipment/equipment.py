@@ -11,6 +11,15 @@ class Equipment:
             return self.name + ' - ' + self.description
         return '{} за {}'.format(self.name + ' - ' + self.description, self.price)
 
+    def info(self):
+        return dict(
+            price=self.price,
+            description=self.description,
+            bodyparts=self.bodyparts,
+            name=self.name,
+            tag=self.tag,
+            kind=self.__dict__.get("kind"))
+
     def __hash__(self):
         return hash(self.name)
 

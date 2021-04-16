@@ -21,7 +21,7 @@ class Npc(MobileObject):
     def drop_award(self):
         chosen = random.random()
         try:
-            item = next(i for prob, i in self.drop.items() if chosen > prob[0] and chosen <= prob[1])
+            item = next(i for prob, i in self.drop.items() if prob[0] < chosen <= prob[1])
             self.world.drop[self.position] = item
             return item.name
         except StopIteration:

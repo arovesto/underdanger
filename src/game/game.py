@@ -52,6 +52,9 @@ class Game:
         self.log = ''
         act, *args = action
         if action != 'Not command':
+            if action == "controls":
+                self.log += "\n" + self.controls()
+                return
             start_ap = self.action_player.ap
             getattr(self.action_player, act)(*args)
             end_ap = self.action_player.ap
@@ -103,3 +106,39 @@ class Game:
 
     def controls(self):
         return small_controls
+
+    def remove_player(self, name):
+        self.names.remove(name)
+        self.world.remove_player(name)
+        if self.name_act_player == name:
+            self.name_act_player = self.names[(self.names.index(self.name_act_player) + 1) % len(self.names)]
+            self.action_player = next(p for p in self.world.players.values() if p.name == self.name_act_player)
+
+    def player_see(self, name):
+        player = None
+        for p in self.world.players.values():
+            if p.name == name:
+                player = p
+                break
+        visual = player.plot().strip("\n ").replace("\n", "<br/>")
+        stats_visual = [p.stats().replace("\n", "<br/>") for p in self.world.players.values()]
+        return dict(
+            visual=visual,
+            stats_visual=stats_visual,
+            last_happened=player.last_happend,
+            log=self.log,
+            is_active=self.name_act_player == player.name,
+            name=player.name,
+            money=player.money,
+            see_radius=player.see,
+            ap=player.ap,
+            hp=player.hp,
+            max_ap=player.max_ap,
+            max_hp=player.max_hp,
+            exp=player.exp,
+            next_level_exp=player.next_level_exp,
+            level=player.level,
+            inventory=[i.info() for i in player.inventory],
+            magicbook=[i.info() for i in player.magicbook],
+            equipment={part: i.info() if i is not None else None for part, i in player.equipment.items()}
+        )

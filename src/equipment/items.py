@@ -34,6 +34,15 @@ class Item:
     def remove(self, user):
         user.inventory.remove(self)
 
+    def info(self):
+        return dict(
+            name=self.name,
+            look=self.look,
+            kind=self.kind,
+            price=self.price,
+            description=self.description,
+        )
+
 
 class HealingPotion(Item):
     def __init__(self, healing_hp, name):

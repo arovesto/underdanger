@@ -30,6 +30,7 @@ class Player(MobileObject):
         self.inventory = []
         self.magicbook = []
         self.walkable_objects = walkable_for_players
+        self.last_happend = ""
         self.next_level_exp = int(self.level ** 1.5 * 2 + 10)
 
     def start_equip(self):
@@ -209,8 +210,8 @@ class Player(MobileObject):
         return pick_up_message
 
     def plot(self):
-        start_line = '\n╔' + '══' * (self.window_width) + '╗'
-        end_line = '\n╚' + '══' * (self.window_width) + '╝'
+        start_line = '\n╔' + '══' * self.window_width + '╗'
+        end_line = '\n╚' + '══' * self.window_width + '╝'
 
         map_plotted = start_line
         for i in range(self.position[0] - self.window_height // 2, self.position[0] + self.window_height // 2 + 1):

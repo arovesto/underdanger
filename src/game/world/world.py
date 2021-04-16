@@ -119,7 +119,7 @@ class World:
         return self.board.square(position).points_to_go
 
     def if_wall(self, position):
-        return self.if_square_kind_in(position, opaque)
+        return self.if_square_is(position, opaque)
 
     def has_player_at(self, position):
         # FIXME done?
@@ -142,3 +142,9 @@ class World:
 
     def nearest_exit_to(self, position):
         return min(self.exits, key=lambda x: distance(x, position))
+
+    def remove_player(self, name):
+        for (pos, p) in self.players.items():
+            if p.name == name:
+                del self.players[pos]
+                return

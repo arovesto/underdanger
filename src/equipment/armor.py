@@ -14,10 +14,11 @@ class Armor(Equipment):
             self.description = "Дает {} защиты".format(block_value)
         self.block = block_value
         self.name = name
-        if use_parts is None:
-            self.use_parts = bodyparts
-        else:
-            self.use_parts = use_parts
+
+    def info(self):
+        inf = super(Armor, self).info()
+        inf["block_value"] = self.block
+        return inf
 
 
 class MagicArmor(Armor):

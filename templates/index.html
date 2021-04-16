@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Socket-Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+
+            namespace = '';
+            let socket = io(namespace);
+            let username = "";
+            let class_ = "";
+
+            socket.on('new player', function(msg, cb) {
+                $('#users').append('<p>' + msg.username  +"</p>");
+                if (cb)
+                    cb();
+            });
+            socket.on('current players', function (msg, cb) {
+                $("#users").empty()
+                msg.players.forEach(function (val) {
+                    $('#users').append('<p>' + val.username  +"</p>");
+                })
+                if (cb)
+                    cb();
+            })
+            socket.on("error", function (msg, cb) {
+                console.log(msg)
+                // TODO log msg.message + msg.status here like "error happened"
+                if (cb)
+                    cb();
+            })
+            socket.on("lobby created", function (msg, cb) {
+                let lobby = $("#lobby_id")
+                lobby.val(msg.id)
+                lobby.prop("disabled", true)
+                if (cb)
+                    cb();
+                $('#connect_play').val("Start game")
+                $('form#join').unbind("submit").submit(function (event) {
+                    socket.emit("start", { lobby_id: $('#lobby_id').val(), username: username})
+                    return false
+                })
+            })
+            socket.on("game started", function (msg, cb) {
+                console.log("game started))")
+                // TODO - close everything before and go to game screen mode
+            })
+            socket.on("game over", function (msg, cb) {
+                // TODO - go to start screen
+            })
+            socket.on("update", function (msg, cb) {
+                let plt = $("#plot")
+                plt.empty()
+                plt.append('<p style="font-family:\'Consolas\', monospace;white-space: break-spaces;background: blanchedalmond">' + msg.visual + '</p>')
+                if (cb)
+                    cb();
+            })
+
+            $('form#player').submit(function(event) {
+                let un = $('#username')
+                let cl = $("#class")
+                username = un.val()
+                class_ = cl.val()
+                if (class_ !== "рыцарь" && class_ !== "волшебник" && class_ !== "лучник") {
+                    // TODO say "wrong class" here
+                    console.log("PANIC, bad class")
+                    return false
+                }
+                un.prop("disabled", true)
+                cl.prop("disabled", true)
+                $('form#player').prop("disabled", true)
+                return false;
+            });
+            $('form#join').submit(function(event) {
+                if (username === "" || class_ === "") {
+                    // TODO - say "you need to specify username and class beforehand" here
+                    return false
+                }
+                $('form#join').prop("disabled", true)
+                $("#lobby_id").prop("disabled", true)
+                socket.emit('join', {username: username, class: class_, lobby_id: $('#lobby_id').val()});
+                return false;
+            });
+            $('form#new_lobby').submit(function(event) {
+                if (username === "" || class_ === "") {
+                    // TODO - say "you need to specify username and class beforehand" here
+                    return false
+                }
+                console.log(username, class_)
+                $("#new_lobby").prop("disabled", true)
+                socket.emit('new', {username: username, class: class_});
+                return false;
+            });
+        });
+    </script>
+</head>
+<body style="background-color:white;">
+    <h1 style="background-color:white;">Test</h1>
+    <form id="player" action="">
+        <input type="text" name="username" id="username" placeholder="Username">
+        <input type="text" name="class" id="class" placeholder="Class">
+        <input type="submit" value="Submit player">
+    </form>
+    <form id="join" action=''>
+        <input type="text" name="lobby_id" id="lobby_id" placeholder="Lobby ID">
+        <input type="submit" name="connect_play" id="connect_play" value="Connect to lobby">
+    </form>
+
+    <form id="new_lobby" action="">
+        <input type="submit" value="New Lobby">
+    </form>
+    <h2 style="background-color:white;">Players</h2>
+    <div id="users" style="display: inline-table"></div>
+    <div id="plot" style="display: inline-flex"></div>
+</body>
+</html>
