@@ -45,17 +45,70 @@ bioms = {
 'ruins': (10, ['slab'] * 10 + ['fence'] * 3 + ['brick'] * 2),
 }
 
-information = {
-    'floor' : (1,   '  '),
-    'slab'  : (1,   ',,'),
-    'grass' : (2,   '&&'),
-    'wall'  : (100, '▓▓'),
-    'exit'  : (1,   '░░'),
-    'unkn'  : (100, '??'),
-    'water' : (2,   '~~'),
-    'fence' : (100, '╬╬'),
-    'door'  : (1,   '╟┤'),
-    'brick' : (100, '██'),
+square_types = {
+    'floor': {
+        'move_cost': 1,
+        'appearance': '  ',
+        'html_style': '',
+        'description': 'здесь ничего нет'
+    },
+    'slab': {
+        'move_cost': 1,
+        'appearance': ',,',
+        'html_style': '',
+        'description': 'ступеньки'
+
+    },
+    'grass': {
+        'move_cost': 2,
+        'appearance': '&&',
+        'html_style': 'color: green',
+        'description': 'густые заросли кустарника'
+    },
+    'wall': {
+        'move_cost': 100,
+        'appearance': '▓▓',
+        'html_style': '',
+        'description': 'каменная стена'
+    },
+    'exit': {
+        'move_cost': 1,
+        'appearance': '░░',
+        'html_style': '',
+        'description': '!!выход из подземелья!!'
+    },
+    'unkn': {
+        'move_cost': 100,
+        'appearance': '??',
+        'html_style': '',
+    },
+    'water': {
+        'move_cost': 2,
+        'appearance': '~~',
+        'html_style': 'color: blue; background: cornflowerblue',
+        'description': 'неглубокий водоём'
+    },
+    'fence': {
+        'move_cost': 100,
+        'appearance': '╬╬',
+        'html_style': '',
+        'description': 'невысокий забор'
+    },
+    'door': {
+        'move_cost': 1,
+        'appearance': '╟┤',
+        'html_style': '',
+        'description': 'прочная дверь'
+    },
+    'brick': {
+        'move_cost': 100,
+        'appearance': '██',
+        'html_style': '',
+        'description': 'кирпичная стена'
+    },
+}
+
+world_squares_types = {
 }
 
 start_words = '''

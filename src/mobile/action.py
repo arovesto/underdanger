@@ -11,7 +11,7 @@ class Action:
 
 class Move(Action):
     def handle(self, game, *args):
-        player = game.action_player
+        player = game.active_player
         target = DIRS[args[0]].go(player.position)
         if not self.can_perform(game, *args):
             if player.ap < player.points_to_go(target):
@@ -21,7 +21,7 @@ class Move(Action):
         return player.name + " походил"
 
     def can_perform(self, game, *args):
-        player = game.action_player
+        player = game.active_player
         target = DIRS[args[0]].go(player.position)
         return game.world.can_move(player, target) and player.ap >= player.points_to_go(target)
 

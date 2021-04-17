@@ -5,15 +5,19 @@ from data.res import win_words, small_controls
 from src.geometry.geometry import square, merge
 
 
+class PlayerIsDead(BaseException):
+    pass
+
+
 class Game:
     def __init__(self, names, classes, shape):
         assert len(names) > 0, 'You can use only positive number of players'
         self.moves_counter = 0
         self.log = ''
         self.who_action = 'игрок'
-        self.name_act_player = names[0]
+        self.active_player_name = names[0]
 
-        self.names = names
+        self.players_names = names
         self.shape = shape
         self.treat_radius = 9
         self.mobs_moving_times = 1
@@ -25,26 +29,26 @@ class Game:
         self.world.place_npcs()
 
         # FIXME add transaction classes for better logging and work
-        self.action_player = next(p for p in self.world.players.values() if p.name == self.name_act_player)
+        self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
 
     def run_checks(self):
-        self.log += self.action_player.level_up()
+        self.log += self.active_player.level_up()
         self.remove_dead_players()
         if self.world.can_heal_players(self.treat_radius):
             for p in self.world.mobs.values():
                 if p.kind == 'игрок': p.heal()
             self.log += '\nВаше здоровье было восстановлено.'
 
-        if self.action_player.ap <= 0:
-            self.action_player.rest()
+        if self.active_player.ap <= 0:
+            self.active_player.rest()
             self.who_action = 'mobs'
-            self.name_act_player = self.names[(self.names.index(self.name_act_player) + 1) % len(self.names)]
-            self.log += '\n' + self.action_player.name + ' кончилась энергия, ход переходит к ' + self.name_act_player
-            self.action_player = next(p for p in self.world.players.values()
-                                      if p.name == self.name_act_player)
+            self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
+            self.log += '\n' + self.active_player.name + ' кончилась энергия, ход переходит к ' + self.active_player_name
+            self.active_player = next(p for p in self.world.players.values()
+                                      if p.name == self.active_player_name)
 
-        if self.who_action == 'игрок' and self.action_player.name == self.names[
-            0] and self.action_player.ap == self.action_player.max_ap:
+        if self.who_action == 'игрок' and self.active_player.name == self.players_names[
+            0] and self.active_player.ap == self.active_player.max_ap:
             self.moves_counter += 1
             self.log += '\nНачался новый ход'
 
@@ -55,12 +59,12 @@ class Game:
             if action == "controls":
                 self.log += "\n" + self.controls()
                 return
-            start_ap = self.action_player.ap
-            getattr(self.action_player, act)(*args)
-            end_ap = self.action_player.ap
-            self.log += '\n' + self.action_player.last_happend
+            start_ap = self.active_player.ap
+            getattr(self.active_player, act)(*args)
+            end_ap = self.active_player.ap
+            self.log += '\n' + self.active_player.last_happend
             if start_ap > end_ap: self.who_action = 'mobs'
-        self.log += self.action_player.pick_up_item()
+        self.log += self.active_player.pick_up_item()
 
     def run_mech(self):
         # FIXME what the fuck even here, looks like metch is work for 2 times at first and one times after, i dunno
@@ -94,25 +98,33 @@ class Game:
             return True
         return False
 
+    def get_status(self):
+        pls_pos = list(self.world.players)
+        if len(pls_pos) == 0:
+            return 'lose'
+        if any(self.world.is_exit(p) for p in pls_pos):
+            return 'win'
+        return 'in_progress'
+
     def remove_dead_players(self):
-        for name in self.names:
+        for name in self.players_names:
             if 'убил игрока ' + name in self.log:
-                self.name_act_player = self.names[(self.names.index(self.name_act_player) + 1) % len(self.names)]
-                self.action_player = next(p for p in self.world.players.values() if p.name == self.name_act_player)
-                self.names.remove(name)
+                self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
+                self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
+                self.players_names.remove(name)
 
     def plot(self):
-        return self.action_player.plot()
+        return self.active_player.plot()
 
     def controls(self):
         return small_controls
 
     def remove_player(self, name):
-        self.names.remove(name)
+        self.players_names.remove(name)
         self.world.remove_player(name)
-        if self.name_act_player == name:
-            self.name_act_player = self.names[(self.names.index(self.name_act_player) + 1) % len(self.names)]
-            self.action_player = next(p for p in self.world.players.values() if p.name == self.name_act_player)
+        if self.active_player_name == name:
+            self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
+            self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
 
     def player_see(self, name):
         player = None
@@ -120,14 +132,20 @@ class Game:
             if p.name == name:
                 player = p
                 break
-        visual = player.plot().strip("\n ").replace("\n", "<br/>")
+        if player is None:
+            raise PlayerIsDead()
+        rendered_map, tile_descriptions = player.plot_for_web()
         stats_visual = [p.stats().replace("\n", "<br/>") for p in self.world.players.values()]
         return dict(
-            visual=visual,
+            is_alive=True,
+            tile_descriptions=tile_descriptions,
+            visual=rendered_map,
             stats_visual=stats_visual,
             last_happened=player.last_happend,
             log=self.log,
-            is_active=self.name_act_player == player.name,
+            is_active=self.active_player_name == player.name,
+            players_names=self.players_names,
+            active_player_name=self.active_player_name,
             name=player.name,
             money=player.money,
             see_radius=player.see,

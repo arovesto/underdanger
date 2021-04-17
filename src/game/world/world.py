@@ -1,4 +1,5 @@
 import random
+from typing import Dict, Tuple
 
 from src.mobile.npc.mobs.warrior import Warrior
 from src.mobile.npc.mobs.archer import Archer
@@ -7,12 +8,13 @@ from src.mobile.npc.mobs.magician import Magician
 from src.geometry.geometry import distance
 from src.mobile.npc.player.classes import generate_player
 from data.res import list_of_mobs, bad_mobs, opaque, npc
+from src.mobile.npc.player.player import Player
 
 
 class World:
     def __init__(self):
         self.mobs = {}
-        self.players = {}
+        self.players: Dict[Tuple[int, int], Player] = {}
         self.drop = {}
         self.mob_level = 1
         self.exits = []

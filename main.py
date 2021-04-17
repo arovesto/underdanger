@@ -65,13 +65,13 @@ def menu_choice(shape):
 def run_random_game(shape):
     game = menu_choice(shape)
 
-    if "Читер" in game.names:
+    if "Читер" in game.players_names:
         write_map(game)
     while not game.game_over():
         game.run_checks()
         show_happends(game)
         if game.who_action == 'игрок':
-            action = get_action(game.action_player)
+            action = get_action(game.active_player)
             if action is None:
                 print("Выхожу...")
                 save_game(game)

@@ -93,6 +93,7 @@ class Board(Rectangle):
         super().__init__(shape)
         self.squares = squares
 
+
     def square(self, position):
         return self.squares[position]
 

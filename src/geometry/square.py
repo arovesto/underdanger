@@ -1,10 +1,14 @@
-from data.res import information, list_of_under_mobs_objects
+from data.res import square_types, list_of_under_mobs_objects
 
 
 class Square:
-    def __init__(self, kind):
-        self.points_to_go, self.look = information[kind]
-        self.kind = kind
+    def __init__(self, square_type):
+        square_info = square_types[square_type]
+        self.kind = square_type
+        self.points_to_go = square_info['move_cost']
+        self.look = square_info['appearance']
+        self.description = square_info['description']
+        self.style = square_info['html_style']
 
     def __str__(self):
         return self.kind

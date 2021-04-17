@@ -4,7 +4,7 @@ from src.geometry.direction import RIGHT
 
 def test_run_action():
     g = Game(names=['Vasya'], classes=['рыцарь'], shape=(25, 25))
-    p = g.action_player
+    p = g.active_player
     pos = p.position
     assert p.ap == p.max_ap
 

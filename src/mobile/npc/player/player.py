@@ -233,5 +233,37 @@ class Player(MobileObject):
         map_plotted += end_line
         return map_plotted
 
+    def plot_for_web(self):
+        start_line = '╔' + '══' * self.window_width + '╗'
+        end_line = '<br>╚' + '══' * self.window_width + '╝'
+        descriptions = {}
+
+        map_plotted = start_line
+        for i in range(self.position[0] - self.window_height // 2, self.position[0] + self.window_height // 2 + 1):
+            line = ''
+            for j in range(self.position[1] - self.window_width // 2, self.position[1] + self.window_width // 2 + 1):
+                if abs(distance(self.position, (i, j)) - self.see) <= 1:
+                    line += '░░'
+                elif distance(self.position, (i, j)) > self.see:
+                    line += '▒▒'
+                elif self.world.is_occupied((i, j)):
+                    tile_id = f"tile_{i}_{j}"
+                    descriptions[tile_id] = self.world.mobs[(i, j)].kind
+                    line += f"<span class='map_tile' id='{tile_id}'>{self.world.mobs[(i, j)].look}</span>"
+                elif self.world.is_drop((i, j)):
+                    tile_id = f"tile_{i}_{j}"
+                    descriptions[tile_id] = self.world.drop[(i, j)].kind
+                    line += f"<span class='map_tile' id='{tile_id}'>{self.world.drop[(i, j)].look}</span>"
+                elif self.world.board.is_inside((i, j)):
+                    tile_id = f"tile_{i}_{j}"
+                    descriptions[tile_id] = self.world.board.square((i, j)).description
+                    style = self.world.board.square((i, j)).style
+                    line += f"<span class='map_tile' style='{style}' id='{tile_id}'>{self.world.board.square((i, j)).look}</span>"
+                else:
+                    line += '▓▓'
+            map_plotted += '<br>║' + line + '║'
+        map_plotted += end_line
+        return map_plotted, descriptions
+
     def is_player(self):
         return True
