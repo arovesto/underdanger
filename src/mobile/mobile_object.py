@@ -17,8 +17,8 @@ class MobileObject:
         self.look = look
         self.world = None
         self.last_happend = ''
-        self.equipment = {'mainhand': None, 'offhand': None, 'legs': None,
-                          'head': None, 'trunk': None, 'hands': None, 'foot': None}
+        self.equipment = {'основное': None, 'дополнительное': None, 'ноги': None,
+                          'голова': None, 'тело': None, 'обувь': None}
 
     def rest(self):
         self.ap = self.max_ap

@@ -144,8 +144,8 @@ class Game:
         if player is None:
             raise PlayerIsDead()
         rendered_map, tile_descriptions = player.plot_for_web()
-        stats_visual = [p.stats().replace("\n", "<br>") for p in self.world.players.values()]
-
+        stats_visual = [p.stats().replace("\n", "<br>") for p in sorted(self.world.players.values(), key=lambda x: x.name)]
+        print('magic_book', player.magicbook)
         return dict(
             is_alive=True,
             tile_descriptions=tile_descriptions,
@@ -168,5 +168,6 @@ class Game:
             level=player.level,
             inventory=player.inventory_for_web(),
             magicbook=[i.info() for i in player.magicbook],
-            equipment={part: i.info() if i is not None else None for part, i in player.equipment.items()}
+            equipment=[dict(part=part, info=i.info()) if i is not None
+                       else dict(part=part, info=None) for part, i in sorted(player.equipment.items(), key=lambda x: x[0])]
         )

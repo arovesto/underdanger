@@ -4,18 +4,15 @@ $(document).ready(function () {
     socket.emit("disconnect from room")
     let username = "";
     let class_ = "";
-    // $( window ).onbeforeunload(function() {
-    //   socket.emit("disconnect")
-    // });
+
     $( window ).unload(function() {
+        console.log("disconnect unload")
         socket.emit("disconnect from room")
     })
     $( window ).bind('beforeunload', function() {
+        console.log("disconnect beforeunload")
         socket.emit("disconnect from room")
     });
-    // $( window ).on("unload", function() {
-    //   socket.emit("disconnect")
-    // });
     let playerState = 'default';
     let lobbyID = "";
 
@@ -41,6 +38,8 @@ $(document).ready(function () {
                 $("#tile_description").empty();
             });
     socket.on('lobby players', function (msg) {
+        //$("#sidebar_left").show()
+        //console.log("here");
         $("#users").empty()
         msg.players.forEach(function (val) {
             $('#users').append('<li>' + val.username + "</li>");
@@ -68,7 +67,8 @@ $(document).ready(function () {
     socket.on("game started", function (msg) {
         lobbyID = $("#lobby_id").val()
         $("#menu").empty()
-        $("#game_field").css("background", "blanchedalmond")
+        $("#game_field").css("background", "blanchedalmond");
+        $("#sidebar_right").css("display", "block");
         // обработка кнопок управления
         $(document).keydown(function (event) {
             let action = undefined;
@@ -93,6 +93,7 @@ $(document).ready(function () {
                     action = "nothing"
                     break
                 }
+                case 'я':
                 case 'z': {
                     if (playerState === 'attack') {
                         playerState = 'default';
@@ -101,6 +102,7 @@ $(document).ready(function () {
                     }
                     break
                 }
+                case 'ч':
                 case 'x': {
                     if (playerState === 'secondary_attack') {
                         playerState = 'default';
@@ -159,9 +161,11 @@ $(document).ready(function () {
             plt.text('Ваш герой погиб, игра окончена.');
         }
         $(document).unbind('keydown');
+        $("#tile_description").empty();
     })
 
     socket.on("update", function (msg) {
+        $("#tile_description").empty();
         let tileDescriptions = msg.tile_descriptions;
         $("#users").empty();
         msg.players_names.forEach(function (val) {
@@ -178,18 +182,75 @@ $(document).ready(function () {
         $("#inventory").empty()
         msg.inventory.forEach(function (val, i) {
             let item_name = "inventory_item_" + i
-            $("#inventory").append('<li id="' + item_name + '">'+ val.name + ' (' + val.count + ')</li>')
-            $("#" + item_name).mouseover(function () {
-                $("#tile_description").append(val.description);
-            })
-            .mouseout(function () {
-                $("#tile_description").empty();
-            });
+            $("#inventory").append('<li id="' + item_name + '">' + val.name + ' (' + val.count + ')</li>')
+            $("#" + item_name)
+                .mouseover(function () {
+                    $(this).css("background", "yellow")
+                    $("#tile_description").append(val.description);
+                })
+                .mouseout(function () {
+                    $(this).css("background", "none")
+                    $("#tile_description").empty();
+                })
+                .click(function (event) {
+                    $("#tile_description").empty();
+                    socket.emit("move", {
+                        username: username,
+                        action: ["equip_or_use", val.name],
+                        lobby_id: lobbyID
+                    });
+                });
+        })
+        $("#equipment").empty()
+        msg.equipment.forEach(function (val, i) {
+            let item_name = "equipment_item_" + i
+            if (val.info !== null) {
+                $("#equipment").append('<li id="' + item_name + '">' + val.part + ": " + val.info.name + '</li>')
+                $("#" + item_name)
+                    .mouseover(function () {
+                        $(this).css("background", "yellow")
+                        $("#tile_description").append(val.description);
+                    })
+                    .mouseout(function () {
+                        $(this).css("background", "none")
+                        $("#tile_description").empty();
+                    })
+                    .click(function (event) {
+                        $("#tile_description").empty();
+                        socket.emit("move", {
+                            username: username,
+                            action: ["unequip", val.info.name],
+                            lobby_id: lobbyID
+                        });
+                    });
+            }
+        })
+        $("#magic_book").empty()
+        msg.magicbook.forEach(function (val, i) {
+            let item_name = "magic_item_" + i
+            $("#magic_book").append('<li id="' + item_name + '">' + val.name + '</li>')
+            $("#" + item_name)
+                .mouseover(function () {
+                    $(this).css("background", "yellow")
+                    $("#tile_description").append(val.description);
+                })
+                .mouseout(function () {
+                    $(this).css("background", "none")
+                    $("#tile_description").empty();
+                })
+                .click(function (event) {
+                    $("#tile_description").empty();
+                    socket.emit("move", {
+                        username: username,
+                        action: ["magic", val.name],
+                        lobby_id: lobbyID
+                    });
+                });
         })
 
-        $("#log").empty().append('<p>'+msg.log+'</p>');
+        $("#log").append('<li>' + msg.log + '</li>').scrollTop($("#log")[0].scrollHeight);
 
-        plt.append('<p style="font-family:\'Consolas\', monospace; white-space: pre-wrap">' + msg.stats_visual.join("<br>") + '</p>')
+        plt.append('<p style="white-space: pre-wrap">' + msg.stats_visual.join("<br>") + '</p>')
         $(".map_tile")
             .mouseover(function () {
                 let tileId = $(this).attr('id');

@@ -10,7 +10,7 @@ class Weapon(Equipment):
 
 
 class Knife(Weapon):
-    bodyparts = ['mainhand']
+    bodyparts = ['основное']
     look = '!.'
 
     def __init__(self, name='knife', damage=4, cost=2):
@@ -72,7 +72,7 @@ class Spear(Weapon):
 
 
 class Bow(Weapon):
-    bodyparts = ['mainhand', 'offhand']
+    bodyparts = ['основное', 'дополнительное']
     look = '{.'
 
     def __init__(self, name='bow', damage=6, cost=3, range_=range(7)):

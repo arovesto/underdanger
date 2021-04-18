@@ -63,38 +63,38 @@ class StealthCloak(Armor):
 
 # TODO add legend armor for warrior ONLY (hard shit)
 
-def helmet(): return Armor(2, ['head'], 'шлем')
+def helmet(): return Armor(2, ['голова'], 'шлем')
 
 
-def rogue_helmet(): return Armor(3, ['head'], 'хороший шлем')
+def rogue_helmet(): return Armor(3, ['голова'], 'хороший шлем')
 
 
-def round_shield(): return Armor(6, ['offhand'], 'круглый щит')
+def round_shield(): return Armor(6, ['дополнительное'], 'круглый щит')
 
 
-def pants(): return Armor(1, ['legs'], 'штаны')
+def pants(): return Armor(1, ['ноги'], 'штаны')
 
 
-def tunic(): return Armor(1, ['trunk'], 'туника')
+def tunic(): return Armor(1, ['тело'], 'туника')
 
 
-def chain_mail(): return Armor(4, ['trunk'], 'кольчуга')
+def chain_mail(): return Armor(4, ['тело'], 'кольчуга')
 
 
-def metal_mail(): return Armor(6, ['trunk'], 'броня')
+def metal_mail(): return Armor(6, ['тело'], 'броня')
 
 
-def shoes(): return Armor(1, ['foot'], 'сапоги')
+def shoes(): return Armor(1, ['обувь'], 'сапоги')
 
 
-def aluminium_mail(): return Armor(8, ['trunk'], 'алюминиевая кольчуга')
+def aluminium_mail(): return Armor(8, ['тело'], 'алюминиевая кольчуга')
 
 
-def heavy_armor(): return Armor(12, ['trunk'], "тяжелейшая броня")
+def heavy_armor(): return Armor(12, ['тело'], "тяжелейшая броня")
 
 
 def magic_tunic(): return MagicArmor(4, ["trunk"], "волшебная туника", description="Волшебнику это понравится")
 
 
-def stealth_cloak(): return StealthCloak(4, ['trunk'], "плащ невидимости",
+def stealth_cloak(): return StealthCloak(4, ['тело'], "плащ невидимости",
                                          description="Добавляет владельцу маскировки. Отлично подойдет лучнику")

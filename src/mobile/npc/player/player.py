@@ -129,7 +129,7 @@ class Player(MobileObject):
 
     def inventory_for_web(self):
         showed_dict = Counter(self.inventory)
-        return [dict(count=cnt, **item.info()) for item, cnt in showed_dict.items()]
+        return [dict(count=cnt, **item.info()) for item, cnt in sorted(showed_dict.items(), key=lambda x: x[0].name)]
 
     def blocked_damage(self, damage):
         return ceil(damage * (1 - (sum(
@@ -164,6 +164,13 @@ class Player(MobileObject):
         except StopIteration:
             self.last_happend = self.name + " не может использовать " + item_name
 
+    def equip_or_use(self, item_name, *item_args):
+        try:
+            item = next(i for i in self.inventory if i.name == item_name and i.kind == 'usable')
+            self.last_happend = item.use(self, *item_args)
+        except StopIteration:
+            self.equip(item_name)
+
     def remove(self, item_name):
         try:
             item = next(i for i in self.inventory if i.name == item_name)
@@ -184,14 +191,14 @@ class Player(MobileObject):
             self.last_happend = self.name + ' не имеет достаточно очков для ' + weapon.name
 
     def use_main_weapon(self, direction):
-        if self.equipment['mainhand'] is not None and self.equipment['mainhand'].kind == 'weapon':
-            return self.use_weapon(self.equipment['mainhand'], direction)
+        if self.equipment['основное'] is not None and self.equipment['основное'].kind == 'weapon':
+            return self.use_weapon(self.equipment['основное'], direction)
         else:
             self.last_happend = self.name + ' не имеет основного оружия'
 
     def use_second_weapon(self, direction):
-        if self.equipment['offhand'] is not None and self.equipment['offhand'].kind == 'weapon':
-            return self.use_weapon(self.equipment['offhand'], direction)
+        if self.equipment['дополнительное'] is not None and self.equipment['дополнительное'].kind == 'weapon':
+            return self.use_weapon(self.equipment['дополнительное'], direction)
         else:
             self.last_happend = self.name + ' не имеет запасного оружия'
 

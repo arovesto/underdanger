@@ -25,19 +25,25 @@
         <input type="submit" id="create_room_button" value="Создать комнату">
     </form>
     </div>
-    <div id="game_field" style="display: flex; cursor: default">
+    <div id="game_field" style="display: flex; cursor: default; font-family:'Consolas', monospace;">
         <div id="sidebar_left" style="width:100px">
-            <h3 style="color: darkgreen">Игроки:</h3>
+            <h3 style="color: darkgreen;">Игроки:</h3>
             <div id="users"></div>
         </div>
 
         <div id="plot" style="cursor: default"></div>
-
-        <div id="sidebar_right" style="margin-left:30px">
+        <div id="sidebar_right" style="margin-left:30px; display: none">
+            <h4>Инвентарь</h4>
             <div id="inventory"></div>
-            <div id="log" style="width:200px"></div>
+            <h4>Надето на героя</h4>
+            <div id="equipment"></div>
+            <h4>Магическая книга</h4>
+            <div id="magic_book"></div>
+            <div id="log" style="height: 200px; overflow: scroll"></div>
         </div>
+        <div style="flex-basis: 100%; height: 0"></div>
+        <div id="tile_description"></div>
+
     </div>
-    <div id="tile_description"></div>
 </body>
 </html>
