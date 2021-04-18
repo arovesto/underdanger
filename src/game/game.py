@@ -67,6 +67,11 @@ class Game:
             if start_ap > end_ap: self.who_action = 'mobs'
         self.log += self.active_player.pick_up_item()
 
+        self.active_player_name = self.players_names[
+            (self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
+        self.active_player = next(p for p in self.world.players.values()
+                                  if p.name == self.active_player_name)
+
     def run_mech(self):
         # FIXME what the fuck even here, looks like metch is work for 2 times at first and one times after, i dunno
         not_player_characters = [m for m in self.world.mobs_near(merge([square(pos, self.treat_radius * 2)
