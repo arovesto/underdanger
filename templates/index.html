@@ -155,7 +155,7 @@
                 // TODO - close everything before and go to game screen mode
             })
             socket.on("game over", function (msg) {
-                let plt = $("#plot");
+                let plt = $("#game_field");
                 plt.empty();
                 if (msg.game_status === 'win') {
                     plt.text('Вы нашли выход из подземелья!');
@@ -163,9 +163,6 @@
                     plt.text('Ваш герой погиб, игра окончена.');
                 }
                 $(document).unbind('keydown');
-                $('#users').empty();
-                $("#tile_description").empty();
-
             })
 
             socket.on("update", function (msg) {
@@ -261,7 +258,5 @@
         <div id="plot" style="display: inline-flex; cursor: default"></div>
     </div>
     <div id="tile_description"></div>
-
-
 </body>
 </html>
