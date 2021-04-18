@@ -43,7 +43,7 @@ $(document).ready(function () {
     socket.on('lobby players', function (msg) {
         $("#users").empty()
         msg.players.forEach(function (val) {
-            $('#users').append('<p>' + val.username + "</p>");
+            $('#users').append('<li>' + val.username + "</li>");
         })
     })
     socket.on("error", function (msg) {
