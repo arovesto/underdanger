@@ -55,7 +55,7 @@ def test_do_share(world):
 
 def test_do_equip(player):
     player.inventory = [player_knife()]
-    assert player.equipment['mainhand'] is None
+    assert player.equipment['основное'] is None
     player.equip('меч')
-    assert player.equipment['mainhand'].name == 'меч'
-    assert player.equipment['mainhand'].user == player
+    assert player.equipment['основное'].name == 'меч'
+    assert player.equipment['основное'].user == player
