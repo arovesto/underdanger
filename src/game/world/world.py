@@ -149,4 +149,5 @@ class World:
         for (pos, p) in self.players.items():
             if p.name == name:
                 del self.players[pos]
+                del self.mobs[pos]
                 return

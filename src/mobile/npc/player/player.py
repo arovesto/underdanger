@@ -127,6 +127,10 @@ class Player(MobileObject):
             '{} - {}, {} штук'.format(item.name, item.description, showed_dict[item]) for item in showed_dict)
         self.last_happend += '\n'
 
+    def inventory_for_web(self):
+        showed_dict = Counter(self.inventory)
+        return [dict(count=cnt, **item.info()) for item, cnt in showed_dict.items()]
+
     def blocked_damage(self, damage):
         return ceil(damage * (1 - (sum(
             a.block for a in self.equipment.values() if a is not None and a.kind == 'armor') / max_armor_value)))

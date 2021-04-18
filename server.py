@@ -2,7 +2,7 @@ import uuid
 from threading import Lock
 from typing import Dict, Optional
 
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room
 from src.game.game import Game, PlayerIsDead
 from data import res
@@ -37,8 +37,7 @@ class Lobby:
             names = [p["username"] for p in self.players.values()]
             classes = [p["class"] for p in self.players.values()]
             self.g = Game(names, classes, shape)
-            for p in self.players.values():
-                emit("update", self.g.player_see(p["username"]), to=p["sid"])  # hopefully it will work
+            self.update()
         return self.g
 
     def remove_player(self, sid):
@@ -48,10 +47,24 @@ class Lobby:
                     del self.players[n]
                     if self.g is not None:
                         self.g.remove_player(n)
+                        self.update()
                     break
-            return len(self.players) == 0
 
-    def update(self, player_name, action):
+    def empty(self):
+        return len(self.players) == 0
+
+    def update(self):
+        new_players = {}
+        for p in self.players.values():
+            try:
+                emit("update", self.g.player_see(p["username"]), to=p["sid"])
+                new_players[p["username"]] = p
+            except PlayerIsDead:
+                emit("game over", dict(game_status="lose"), to=p["sid"])
+                leave_room(self.lobby_id, p["sid"])
+        self.players = new_players
+
+    def run_action(self, player_name, action):
         with self.mtx:
             print(self.g.active_player_name)
             game_status = self.g.get_status()
@@ -64,15 +77,7 @@ class Lobby:
                 if self.g.who_action != "игрок":
                     self.g.run_mech()
                 self.g.run_checks()
-                new_players = {}
-                for p in self.players.values():
-                    try:
-                        emit("update", self.g.player_see(p["username"]), to=p["sid"])
-                        new_players[p["username"]] = p
-                    except PlayerIsDead:
-                        emit("game over", dict(game_status="lose"), to=p["sid"])
-                        leave_room(self.lobby_id, p["sid"])
-                self.players = new_players
+                self.update()
 
                 game_status = self.g.get_status()
                 if game_status != "in_progress":
@@ -82,13 +87,18 @@ class Lobby:
 
 app = Flask(__name__)
 socket = SocketIO(app)
-shape = (25, 25)
+shape = (100, 100)
 lobbies = dict()
 
 
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket.async_mode)
+
+
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('static', path)
 
 
 @app.errorhandler(404)
@@ -101,7 +111,7 @@ def info():
     return dict(classes=res.classes)
 
 
-@socket.on("new")
+@socket.on("new room")
 def new_lobby(player):
     print('new lobby')
     print([e.__dict__ for e in lobbies.values()])
@@ -130,12 +140,14 @@ def join_lobby(player):
 
 
 @socket.on("disconnect")
+@socket.on("disconnect from room")
 def disconnect():
     global lobbies
     s = request.sid
     new_lobby = dict()
     for i, l in lobbies.items():
-        if not l.remove_player(s):
+        l.remove_player(s)
+        if not l.empty():
             new_lobby[i] = l
     lobbies = new_lobby
 
@@ -148,7 +160,7 @@ def move(data):
     lobby_id = data.get("lobby_id")
     if lobby_id in lobbies:
         lobby = lobbies[lobby_id]
-        lobby.update(data.get("username"), data.get("action"))
+        lobby.run_action(data.get("username"), data.get("action"))
 
 
 @socket.on("start")

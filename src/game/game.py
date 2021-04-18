@@ -32,6 +32,7 @@ class Game:
         self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
 
     def run_checks(self):
+        self.active_player.ap = 1000  # FIXME to test no ap
         self.log += self.active_player.level_up()
         self.remove_dead_players()
         if self.world.can_heal_players(self.treat_radius):
@@ -73,6 +74,7 @@ class Game:
                                  m.kind != 'игрок']
         for _ in range(self.mobs_moving_times):
             for mob in not_player_characters:
+                mob.ap = 100  # FIXME to test "do action every time"
                 if mob.ap <= 0:
                     mob.rest()
                     continue
@@ -107,6 +109,8 @@ class Game:
         return 'in_progress'
 
     def remove_dead_players(self):
+        if len(self.world.players.values()) == 0:
+            return
         for name in self.players_names:
             if 'убил игрока ' + name in self.log:
                 self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
@@ -120,11 +124,11 @@ class Game:
         return small_controls
 
     def remove_player(self, name):
-        self.players_names.remove(name)
-        self.world.remove_player(name)
         if self.active_player_name == name:
             self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
             self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
+        self.players_names.remove(name)
+        self.world.remove_player(name)
 
     def player_see(self, name):
         player = None
@@ -135,14 +139,15 @@ class Game:
         if player is None:
             raise PlayerIsDead()
         rendered_map, tile_descriptions = player.plot_for_web()
-        stats_visual = [p.stats().replace("\n", "<br/>") for p in self.world.players.values()]
+        stats_visual = [p.stats().replace("\n", "<br>") for p in self.world.players.values()]
+
         return dict(
             is_alive=True,
             tile_descriptions=tile_descriptions,
             visual=rendered_map,
             stats_visual=stats_visual,
             last_happened=player.last_happend,
-            log=self.log,
+            log=self.log.replace('\n', '<br>'),
             is_active=self.active_player_name == player.name,
             players_names=self.players_names,
             active_player_name=self.active_player_name,
@@ -156,7 +161,7 @@ class Game:
             exp=player.exp,
             next_level_exp=player.next_level_exp,
             level=player.level,
-            inventory=[i.info() for i in player.inventory],
+            inventory=player.inventory_for_web(),
             magicbook=[i.info() for i in player.magicbook],
             equipment={part: i.info() if i is not None else None for part, i in player.equipment.items()}
         )
