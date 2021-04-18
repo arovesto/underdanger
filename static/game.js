@@ -38,9 +38,8 @@ $(document).ready(function () {
                 $("#tile_description").empty();
             });
     socket.on('lobby players', function (msg) {
-        //$("#sidebar_left").show()
-        //console.log("here");
         $("#users").empty()
+        $("#sidebar_left").show()
         msg.players.forEach(function (val) {
             $('#users').append('<li>' + val.username + "</li>");
         })
