@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Socket-Test</title>
+    <title>Underdanger</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
             type="text/javascript"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
@@ -14,35 +14,66 @@
             let class_ = "";
 
             let playerState = 'default';
+            let lobbyID = "";
 
-            socket.on('lobby players', function (msg, cb) {
+             $("#class")
+                    .mouseover(function () {
+                        $("#tile_description").text("вы можете выбрать один из классов: рыцарь, лучник, волшебник");
+                    })
+                    .mouseout(function () {
+                        $("#tile_description").empty();
+                    });
+             $("#username")
+                    .mouseover(function () {
+                        $("#tile_description").text("ваше имя в игре");
+                    })
+                    .mouseout(function () {
+                        $("#tile_description").empty();
+                    });
+            socket.on('lobby players', function (msg) {
                 $("#users").empty()
                 msg.players.forEach(function (val) {
                     $('#users').append('<p>' + val.username + "</p>");
                 })
-                if (cb)
-                    cb();
             })
-            socket.on("error", function (msg, cb) {
+            $("#lobby_id")
+                    .mouseover(function () {
+                        $("#tile_description").text("вставьте ID комнаты вашего друга");
+                    })
+                    .mouseout(function () {
+                        $("#tile_description").empty();
+                    });
+            socket.on('lobby players', function (msg) {
+                $("#users").empty()
+                msg.players.forEach(function (val) {
+                    $('#users').append('<p>' + val.username + "</p>");
+                })
+            })
+            socket.on("error", function (msg) {
                 console.log(msg)
                 // TODO log msg.message + msg.status here like "error happened"
-                if (cb)
-                    cb();
             })
-            socket.on("lobby created", function (msg, cb) {
+            socket.on("lobby created", function (msg) {
                 let lobby = $("#lobby_id")
                 lobby.val(msg.id)
                 lobby.prop("disabled", true)
-                if (cb)
-                    cb();
-                $('#connect_play').val("Start game")
+                $('#connect_play').val("Начать игру")
+                lobby.mouseover(function () {
+                        $("#tile_description").text("скопируйте это значение своему товарищу");
+                    })
+                    .mouseout(function () {
+                        $("#tile_description").empty();
+                    });
                 $('form#join').unbind("submit").submit(function (event) {
-                    console.log({lobby_id: $('#lobby_id').val(), username: username})
-                    socket.emit("start", {lobby_id: $('#lobby_id').val(), username: username})
+                    socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username})
                     return false
                 })
             })
-            socket.on("game started", function (msg, cb) {
+            socket.on("game started", function (msg) {
+                lobbyID = $("#lobby_id").val()
+                $("#menu").empty()
+                $("#game_field").css("background", "blanchedalmond")
+
                 $(document).keydown(function (event) {
                     let action = undefined;
                     switch (event.key) {
@@ -91,7 +122,7 @@
                             socket.emit("move", {
                                 username: username,
                                 action: ["nothing"],
-                                lobby_id: $('#lobby_id').val()
+                                lobby_id: lobbyID
                             });
                             return
                         }
@@ -115,7 +146,7 @@
                         socket.emit("move", {
                             username: username,
                             action: [action_type, action],
-                            lobby_id: $('#lobby_id').val()
+                            lobby_id: lobbyID
                         });
                     }
                 });
@@ -123,7 +154,7 @@
                 console.log("game started!");
                 // TODO - close everything before and go to game screen mode
             })
-            socket.on("game over", function (msg, cb) {
+            socket.on("game over", function (msg) {
                 let plt = $("#plot");
                 plt.empty();
                 if (msg.game_status === 'win') {
@@ -137,7 +168,7 @@
 
             })
 
-            socket.on("update", function (msg, cb) {
+            socket.on("update", function (msg) {
                 let tileDescriptions = msg.tile_descriptions;
                 $("#users").empty();
                 msg.players_names.forEach(function (val) {
@@ -149,24 +180,17 @@
                 })
                 let plt = $("#plot")
                 plt.empty()
-                plt.append('<p style="font-family:\'Consolas\', monospace;white-space: break-spaces;background: blanchedalmond">' + msg.visual + '</p>')
-                
-                msg.stats_visual.forEach(function (val) {
-                    plt.append('<p style="font-family:\'Consolas\', monospace;white-space: break-spaces;background: blanchedalmond">' + val + '</p>')
-                })
+                plt.append('<p style="font-family:\'Consolas\', monospace;white-space: break-spaces">' + msg.visual + '</p>')
+
+                plt.append('<p style="font-family:\'Consolas\', monospace;white-space: break-spaces">' + msg.stats_visual.join("<br>") + '</p>')
                 $(".map_tile")
                     .mouseover(function () {
                         let tileId = $(this).attr('id');
-                        console.log(tileId);
-                        console.log(tileDescriptions);
                         $("#tile_description").text(tileDescriptions[tileId]);
                     })
                     .mouseout(function () {
                         $("#tile_description").empty();
                     });
-
-                if (cb)
-                    cb();
             })
 
             $('form#player').submit(function (event) {
@@ -191,7 +215,6 @@
                 }
                 $('form#join').prop("disabled", true)
                 $("#lobby_id").prop("disabled", true)
-                console.log({username: username, class: class_, lobby_id: $('#lobby_id').val()})
                 socket.emit('join', {
                     username: username,
                     class: class_,
@@ -204,7 +227,6 @@
                     // TODO - say "you need to specify username and class beforehand" here
                     return false
                 }
-                console.log(username, class_)
                 $("#new_lobby").prop("disabled", true)
                 socket.emit('new', {username: username, class: class_});
                 return false;
@@ -213,23 +235,33 @@
     </script>
 </head>
 <body style="background-color:white;">
-    <h1 style="background-color:white;">Test</h1>
+    <h1 style="background-color:white;">Underdanger</h1>
+    <p style="font-size: smaller;font-style: oblique;">by <a href="https://github.com/arovesto">@arovesto</a> and <a href="https://github.com/kav1nsky">@kav1nsky</a>, исходный код на <a href="https://github.com/arovesto/underdanger/">github</a></p>
+    <div id="menu">
+            <p>Создайте игрока, создайте комнату или присоединитесь к существующей, играйте!</p>
     <form id="player" action="">
-        <input type="text" name="username" id="username" placeholder="Username">
-        <input type="text" name="class" id="class" placeholder="Class">
-        <input type="submit" value="Submit player">
+        <input type="text" name="username" id="username" placeholder="Имя игрока">
+        <input type="text" name="class" id="class" placeholder="Класс игрока">
+        <input type="submit" value="Создать игрока">
     </form>
     <form id="join" action=''>
-        <input type="text" name="lobby_id" id="lobby_id" placeholder="Lobby ID">
-        <input type="submit" name="connect_play" id="connect_play" value="Connect to lobby">
+        <input type="text" name="lobby_id" id="lobby_id" placeholder="ID комнаты">
+        <input type="submit" name="connect_play" id="connect_play" value="Присоединиться к комнате">
     </form>
-
     <form id="new_lobby" action="">
-        <input type="submit" value="New Lobby">
+        <input type="submit" value="Создать комнату">
     </form>
-    <h2 style="background-color:white;">Players</h2>
-    <div id="users" style="display: inline-table"></div>
-    <div id="plot" style="display: inline-flex; cursor: default"></div>
+    </div>
+    <div id="game_field" style="display: inline-flex; cursor: default">
+        <div style="display: inline-table">
+            <h3 style="color: darkgreen">Игроки:</h3>
+            <div id="users" style="display: inline-flex"></div>
+        </div>
+
+        <div id="plot" style="display: inline-flex; cursor: default"></div>
+    </div>
     <div id="tile_description"></div>
+
+
 </body>
 </html>
