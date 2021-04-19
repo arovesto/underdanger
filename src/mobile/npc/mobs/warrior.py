@@ -55,7 +55,7 @@ class Warrior(Npc):
                     self.last_happend = ''
         elif self.state == 'attack':
             self.state = "observe"
-            self.last_happend = "\n" + self.show() + " потерял игрока из виду"
+            # self.last_happend = "\n" + self.show() + " потерял игрока из виду"
         else:
             self.do_random_move()
 
