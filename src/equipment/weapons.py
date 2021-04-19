@@ -29,7 +29,7 @@ class Knife(Weapon):
 
 
 class Spear(Weapon):
-    bodyparts = ["mainhand"]
+    bodyparts = ["основное"]
     look = "./"
 
     def __init__(self, name="копье", damage=6, cost=2, range_=3):

@@ -103,6 +103,8 @@ class Map(Item):
         self.description = "показывает, где выход, максимум {} использований".format(self.uses)
 
     def use(self, user):
+        if self.uses <= 0:
+            self.remove(user)
         self.uses -= 1
         closest_exit = user.world.nearest_exit_to(user.position)
         delta_to_exit = sub(closest_exit, user.position)
