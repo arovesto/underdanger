@@ -97,15 +97,18 @@ class HealthSpeedPotion(Item):
 
 
 class Map(Item):
-    def __init__(self, name):
+    def __init__(self, name, uses=10):
         super().__init__(name, "[]")
-        self.description = "показывает, где выход"
+        self.uses = uses
+        self.description = "показывает, где выход, максимум {} использований".format(self.uses)
 
     def use(self, user):
+        self.uses -= 1
         closest_exit = user.world.nearest_exit_to(user.position)
         delta_to_exit = sub(closest_exit, user.position)
-        return "Посмотрев на карту {} увидел, что ему надо идти на {}, ещё {} шагов" \
-            .format(user.name, where_to_go(delta_to_exit), manhattan(closest_exit, user.position))
+        return "Посмотрев на карту {} увидел, что ему надо идти на {}. Карта потёрлась, похоже что её удастся " \
+               "использовать ещё {} раз" \
+            .format(user.name, where_to_go(delta_to_exit), self.uses)
 
 
 class Undying(Item):
