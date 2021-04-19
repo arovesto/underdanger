@@ -9,7 +9,7 @@ from src.geometry.geometry import distance
 from src.mobile.npc.player.classes import generate_player
 from data.res import list_of_mobs, bad_mobs, opaque, npc
 from src.mobile.npc.player.player import Player
-
+from data.res import walkable_for_players
 
 class World:
     def __init__(self):
@@ -29,13 +29,11 @@ class World:
 
     def add_players(self, names, classes, position):
         pos = position
+        if not self.can_move_player(pos):
+            pos = next(p for p in self.board.neighbours(position) if self.can_move_player(p))
         for name, class_ in zip(names, classes):
             player = self.create_player(pos, class_, name)
-            try:
-                pos = next(p for p in self.board.neighbours(position)
-                           if self.can_move(player, p))
-            except StopIteration:
-                return 'Cannot place players'
+            pos = next(p for p in self.board.neighbours(position) if self.can_move(player, p))
 
     def random_empty_position(self):
         position = self.board.random_position()
@@ -94,6 +92,10 @@ class World:
 
     def can_move(self, entity, position):
         return (self.board.is_inside(position) and self.board.square(position).kind in entity.walkable_objects
+                and not self.is_occupied(position))
+
+    def can_move_player(self, position):
+        return (self.board.is_inside(position) and self.board.square(position).kind in walkable_for_players
                 and not self.is_occupied(position))
 
     def mobs_near(self, shape):

@@ -25,14 +25,17 @@ class Lobby:
         self.mtx = Lock()
 
     def enter_lobby(self, player):
-        if self.g is not None:
-            return
         if player["username"] in self.players:
             return
         join_room(self.lobby_id)
         self.players[player["username"]] = player
         emit("lobby players", dict(players=list(self.players.values())), to=self.lobby_id)
-
+        if self.g is not None:
+            with self.mtx:
+                self.g.add_player(player["username"], player["class"])
+                emit("game started", to=player["sid"])
+                self.update()
+                
     def start(self, starter_name):
         if self.owner["username"] == starter_name:
             names = [p["username"] for p in self.players.values()]

@@ -20,10 +20,10 @@ class Game:
         self.mobs_moving_times = 1
         self.dead_players = set()
 
-        board, start_position, exit_position = generate_game_board(shape)
+        board, self.start_position, exit_position = generate_game_board(shape)
         self.world = World()
         self.world.add_board(board, exit_position)
-        self.world.add_players(names, classes, start_position)
+        self.world.add_players(names, classes, self.start_position)
         self.world.place_npcs()
 
         # FIXME add transaction classes for better logging and work
@@ -137,6 +137,10 @@ class Game:
             self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
         self.players_names.remove(name)
         self.world.remove_player(name)
+
+    def add_player(self, name, class_):
+        self.world.add_players([name], [class_], self.start_position)
+        self.players_names.append(name)
 
     def player_see(self, name):
         player = None
