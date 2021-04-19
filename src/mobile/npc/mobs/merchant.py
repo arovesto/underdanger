@@ -56,3 +56,6 @@ class Merchant(Npc):
     def show_items(self):
         return self.kind + ' продает:\n' + '\n'.join(str(item)
                                                      for item in list(self.store.values()))
+
+    def get_trade_info(self):
+        return dict(trader_name=self.name, trader_type=self.kind, trades=[e.info() for e in sorted(self.store.values(), key=lambda x: x.name)])

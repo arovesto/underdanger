@@ -1,4 +1,5 @@
 from src.geometry.geometry import sub, distance
+from src.util.words import name_to_genitive
 
 
 class MobileObject:
@@ -52,7 +53,7 @@ class MobileObject:
         if entity.hp <= 0:
             self.state = 'observe'
             return entity.die(self)
-        return ' поразил ' + entity.kind + ' на ' + str(entity.blocked_damage(damage))
+        return ' поразил ' + name_to_genitive(entity.kind) + " " + name_to_genitive(entity.name) + ' на ' + str(entity.blocked_damage(damage))
 
     def hit(self, entity, weapon):
         if entity.blocked_damage(weapon.damage) <= 0:

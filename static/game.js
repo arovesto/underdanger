@@ -4,6 +4,7 @@ $(document).ready(function () {
     socket.emit("disconnect from room")
     let username = "";
     let class_ = "";
+    let lobbyStarter = false;
 
     $( window ).unload(function() {
         console.log("disconnect unload")
@@ -16,27 +17,36 @@ $(document).ready(function () {
     let playerState = 'default';
     let lobbyID = "";
 
+    fetch("/static_info").then(data => { return data.json() }).then(function (data) {
+        $("#username").val(data.random_name)
+        data.classes.forEach(function (val) {
+        $("#class").append('<option value="' + val + '">' + val + '</option>')
+    })
+    })
+
      $("#class")
-            .mouseover(function () {
-                $("#tile_description").text("вы можете выбрать один из классов: рыцарь, лучник, волшебник");
-            })
-            .mouseout(function () {
-                $("#tile_description").empty();
-            });
+        .mouseover(function () {
+            $("#tile_description").text("вы можете выбрать один из классов: рыцарь, лучник, волшебник");
+        })
+        .mouseout(function () {
+            $("#tile_description").empty();
+        });
      $("#username")
-            .mouseover(function () {
-                $("#tile_description").text("ваше имя в игре");
-            })
-            .mouseout(function () {
-                $("#tile_description").empty();
-            });
+        .mouseover(function () {
+            $("#tile_description").text("ваше имя в игре");
+        })
+        .mouseout(function () {
+            $("#tile_description").empty();
+        }).click(function () {
+            $(this).unbind("click").select()
+        });
     $("#lobby_id")
-            .mouseover(function () {
-                $("#tile_description").text("вставьте ID комнаты вашего друга");
-            })
-            .mouseout(function () {
-                $("#tile_description").empty();
-            });
+        .mouseover(function () {
+            $("#tile_description").text("вставьте ID комнаты вашего друга");
+        })
+        .mouseout(function () {
+            $("#tile_description").empty();
+        });
     socket.on('lobby players', function (msg) {
         $("#users").empty()
         $("#sidebar_left").show()
@@ -45,13 +55,13 @@ $(document).ready(function () {
         })
     })
     socket.on("error", function (msg) {
-        console.log(msg)
+        console.log(msg);
         // TODO log msg.message + msg.status here like "error happened"
     })
     socket.on("lobby created", function (msg) {
-        let lobby = $("#lobby_id")
-        lobby.val(msg.id)
-        $('#create_room_button').val("Начать игру")
+        let lobby = $("#lobby_id");
+        lobby.val(msg.id);
+        $('#create_room_button').val("Начать игру");
         lobby.mouseover(function () {
                 $("#tile_description").text("скопируйте это значение своему товарищу");
             })
@@ -59,37 +69,42 @@ $(document).ready(function () {
                 $("#tile_description").empty();
             });
         $('#create_room_button').unbind("click").click(function (event) {
-            socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username})
+            lobbyStarter = true;
+            socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username});
             return false
         })
     })
     socket.on("game started", function (msg) {
-        lobbyID = $("#lobby_id").val()
+        if (lobbyID === "") {
+            lobbyID = $("#lobby_id").val()
+        }
+        $("#game_field").css("background", "blanchedalmond");;
+        $("#game_over").hide();
         $("#menu").empty()
-        $("#game_field").css("background", "blanchedalmond");
-        $("#sidebar_right").css("display", "block");
+        $("#log").empty();
         // обработка кнопок управления
         $(document).keydown(function (event) {
+            event.preventDefault();
             let action = undefined;
             switch (event.key) {
                 case 'ArrowUp': {
-                    action = "up"
+                    action = "up";
                     break
                 }
                 case 'ArrowDown': {
-                    action = "down"
+                    action = "down";
                     break
                 }
                 case 'ArrowLeft': {
-                    action = "left"
+                    action = "left";
                     break
                 }
                 case 'ArrowRight': {
-                    action = "right"
+                    action = "right";
                     break
                 }
                 case " ": {
-                    action = "nothing"
+                    action = "nothing";
                     break
                 }
                 case 'я':
@@ -97,7 +112,7 @@ $(document).ready(function () {
                     if (playerState === 'attack') {
                         playerState = 'default';
                     } else {
-                        playerState = 'attack'
+                        playerState = 'attack';
                     }
                     break
                 }
@@ -106,7 +121,7 @@ $(document).ready(function () {
                     if (playerState === 'secondary_attack') {
                         playerState = 'default';
                     } else {
-                        playerState = 'secondary_attack'
+                        playerState = 'secondary_attack';
                     }
                     break
                 }
@@ -152,15 +167,20 @@ $(document).ready(function () {
         // TODO - close everything before and go to game screen mode
     })
     socket.on("game over", function (msg) {
-        let plt = $("#game_field");
-        plt.empty();
-        if (msg.game_status === 'win') {
-            plt.text('Вы нашли выход из подземелья!');
-        } else {
-            plt.text('Ваш герой погиб, игра окончена.');
-        }
-        $(document).unbind('keydown');
         $("#tile_description").empty();
+
+        $(document).unbind('keydown');
+        if (lobbyStarter) {
+            $("#play_again_button").show()
+        }
+
+        if (msg.game_status === 'win') {
+            $("#game_over_text").text('Вы нашли выход из подземелья!');
+        } else {
+            $("#game_over_text").text('Все погибли..., игра окончена.');
+        }
+        $("#game_over").show();
+
     })
 
     socket.on("update", function (msg) {
@@ -174,14 +194,21 @@ $(document).ready(function () {
                 $('#users').append('<p>' + val + "</p>");
             }
         })
-        let plt = $("#plot")
-        plt.empty()
-        plt.append('<p style="font-family:\'Consolas\', monospace;white-space: pre-wrap">' + msg.visual + '</p>')
+        msg.dead_players.forEach(function (val) {
+            $('#users').append('<p style="background: darkgray">' + val + "</p>");
+        })
+        let plt = $("#plot");
+        plt.empty();
+        plt.append('<p style="font-family:\'Consolas\', monospace;white-space: pre-wrap">' + msg.visual + '</p>');
 
-        $("#inventory").empty()
+        let inventory = $("#inventory");
+        inventory.empty();
+        if (msg.inventory.length > 0) {
+            inventory.append("<h4>Инвентарь</h4>");
+        }
         msg.inventory.forEach(function (val, i) {
             let item_name = "inventory_item_" + i
-            $("#inventory").append('<li id="' + item_name + '">' + val.name + ' (' + val.count + ')</li>')
+            inventory.append('<li id="' + item_name + '">' + val.name + ' (' + val.count + ')</li>')
             $("#" + item_name)
                 .mouseover(function () {
                     $(this).css("background", "yellow")
@@ -199,16 +226,20 @@ $(document).ready(function () {
                         lobby_id: lobbyID
                     });
                 });
-        })
-        $("#equipment").empty()
+        });
+        let equipment = $("#equipment");
+        equipment.empty();
+        if (msg.equipment.length > 0) {
+            equipment.append("<h4>Надето на героя</h4>");
+        }
         msg.equipment.forEach(function (val, i) {
             let item_name = "equipment_item_" + i
             if (val.info !== null) {
-                $("#equipment").append('<li id="' + item_name + '">' + val.part + ": " + val.info.name + '</li>')
+                equipment.append('<li id="' + item_name + '">' + val.part + ": " + val.info.name + '</li>')
                 $("#" + item_name)
                     .mouseover(function () {
                         $(this).css("background", "yellow")
-                        $("#tile_description").append(val.description);
+                        $("#tile_description").append(val.info.description);
                     })
                     .mouseout(function () {
                         $(this).css("background", "none")
@@ -224,10 +255,14 @@ $(document).ready(function () {
                     });
             }
         })
-        $("#magic_book").empty()
+        let magicBook = $("#magic_book");
+        magicBook.empty();
+        if (msg.magicbook.length > 0) {
+            magicBook.append("<h4>Магическая книга</h4>");
+        }
         msg.magicbook.forEach(function (val, i) {
-            let item_name = "magic_item_" + i
-            $("#magic_book").append('<li id="' + item_name + '">' + val.name + '</li>')
+            let item_name = "magic_item_" + i;
+            magicBook.append('<li id="' + item_name + '">' + val.name + '</li>');
             $("#" + item_name)
                 .mouseover(function () {
                     $(this).css("background", "yellow")
@@ -246,8 +281,34 @@ $(document).ready(function () {
                     });
                 });
         })
-
-        $("#log").append('<li>' + msg.log + '</li>').scrollTop($("#log")[0].scrollHeight);
+        let tradeOffers = $("#trade_offers");
+        tradeOffers.empty();
+        if (msg.trade_offers !== null) {
+            tradeOffers.append('<h4>Продавец ' + msg.trade_offers.trader_name + ' предлагает:</h4>')
+            msg.trade_offers.trades.forEach(function (val, i) {
+                let item_name = "trade_item_" + i
+                tradeOffers.append('<li id="' + item_name + '">' + val.name + ' за ' + val.price + '</li>')
+                $("#" + item_name)
+                    .mouseover(function () {
+                        $(this).css("background", "yellow")
+                        $("#tile_description").append(val.description);
+                    })
+                    .mouseout(function () {
+                        $(this).css("background", "none")
+                        $("#tile_description").empty();
+                    })
+                    .click(function (event) {
+                        $("#tile_description").empty();
+                        socket.emit("move", {
+                            username: username,
+                            action: ["trade", val.name, msg.trade_offers.trader_name],
+                            lobby_id: lobbyID
+                        });
+                    });
+            })
+        }
+        let log = $("#log");
+        log.append('<p>' + msg.log + '</p>').scrollTop(log[0].scrollHeight);
 
         plt.append('<p style="white-space: pre-wrap">' + msg.stats_visual.join("<br>") + '</p>')
         $(".map_tile")
@@ -268,7 +329,7 @@ $(document).ready(function () {
             // TODO - say "you need to specify username and class beforehand" here
             return false
         }
-        $('form#join').prop("disabled", true)
+        $('form#join :input').prop("disabled", true)
         socket.emit('join', {
             username: username,
             class: class_,
@@ -283,8 +344,17 @@ $(document).ready(function () {
             // TODO - say "you need to specify username and class beforehand" here
             return false
         }
-        $('form#join').prop("disabled", true)
+        $('form#join :input').prop("disabled", true)
+        $("#create_room_button").prop("disabled", false)
         socket.emit('new room', {username: username, class: class_});
         return false;
     });
+    $("#play_again_button").click(function () {
+        if (lobbyStarter) {
+            console.log("restarting game")
+            socket.emit("start", {lobby_id: lobbyID, username: username});
+        } else {
+            console.log("non lobby strater pressed play again button")
+        }
+    })
 });

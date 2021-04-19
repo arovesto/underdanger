@@ -4,11 +4,11 @@ walkable_for_monsters = ['floor', 'exit', 'grass', 'slab']
 
 not_flyable = ['wall', 'brick', 'door']
 
-opaque = ['wall', 'brick'] 
+opaque = ['wall', 'brick']
 
-npc = ['лучник','мечник', 'торговец', 'странник']
+npc = ['лучник', 'мечник', 'торговец', 'странник']
 
-bad_mobs = ['лучник','мечник']
+bad_mobs = ['лучник', 'мечник']
 
 traders = ['торговец', 'странник']
 
@@ -23,10 +23,12 @@ proper_stealth = ['лучник']
 proper_warrior = ["рыцарь"]
 
 names = [
-"Ира", "Максим", "Андрей", "Галя", "Вика", "Маша", "Коля", "Вася", "Саша", "Леша", "Артём", "Аня",
+    "Джеймс", "Петя", "Полинария", "Тёмыч", "Никитос", "Лёха", "Андрей", "Аня", "Саша"
 ]
 
 positive = ["Да", "Yes", "да", "д", "y", "yes", ""]
+
+player_possible_keys_web = {"use_main_weapon", "use_second_weapon", "move_player", "trade", "nothing", "equip_or_use", "unequip", "magic"}
 
 list_of_under_mobs_objects = ['floor'] * 10 + ['grass'] * 2
 
@@ -39,10 +41,10 @@ max_armor_value = 22
 bioms_choice = ['lake'] * 2 + ['cave'] * 5 + ['walls'] * 10 + ['ruins']
 
 bioms = {
-'lake' : (50, ['water'] * 40 + ['grass']),
-'cave' : (15, ['floor'] * 5 + ['wall']),
-'walls': (20, ['wall'] * 10 + ['floor']),
-'ruins': (10, ['slab'] * 10 + ['fence'] * 3 + ['brick'] * 2),
+    'lake': (50, ['water'] * 40 + ['grass']),
+    'cave': (15, ['floor'] * 5 + ['wall']),
+    'walls': (20, ['wall'] * 10 + ['floor']),
+    'ruins': (10, ['slab'] * 10 + ['fence'] * 3 + ['brick'] * 2),
 }
 
 square_types = {
@@ -144,7 +146,7 @@ classes_info = '''
 защитой а так же хорошим мечом, но это и все. Лучник имеет возможность бить издалека, ну и в целом, как
 заядлый охотник, он умеет скрываться куда лучше тех двоих. Выбирай!
 '''
-                                    
+
 controls = '''
 Используй стрелочки на клавиатуре чтобы ходить.
 Если нажать 'z' и стрелочку, то ты используешь свое основное оружие

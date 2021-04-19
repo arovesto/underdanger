@@ -15,35 +15,35 @@
             <p>Создайте игрока, создайте комнату или присоединитесь к существующей, играйте!</p>
     <form id="join" action=''>
         <input type="text" name="username" id="username" placeholder="Имя игрока" value="Джеймс">
-        <select size="1" name="class" id="class">
-            <option value="рыцарь">рыцарь</option>
-            <option value="лучник">лучник</option>
-            <option value="волшебник">волшебник</option>
+        <select size="1" name="class" id="class" style="width: 100px">
         </select>
         <input type="text" name="lobby_id" id="lobby_id" placeholder="ID комнаты">
         <input type="submit" name="connect_play" id="connect_room_button" value="Присоединиться к комнате">
         <input type="submit" id="create_room_button" value="Создать комнату">
     </form>
     </div>
-    <div id="game_field" style="display: flex; cursor: default; font-family:'Consolas', monospace;">
+    <div id="game_over" style="display: none">
+        <p id="game_over_text"></p>
+        <button type="button" name="play_again_button" id="play_again_button" style="display: none">Повторить игру?</button>
+    </div>
+    <div id="game_field" style=" display: flex; cursor: default; font-family:'Consolas', monospace;">
         <div id="sidebar_left" style="width:100px;display: none">
             <h3 style="color: darkgreen;">Игроки:</h3>
             <div id="users"></div>
         </div>
 
         <div id="plot" style="cursor: default"></div>
-        <div id="sidebar_right" style="margin-left:30px; display: none">
-            <h4>Инвентарь</h4>
+        <div id="sidebar_right" style="margin-left:30px">
             <div id="inventory"></div>
-            <h4>Надето на героя</h4>
             <div id="equipment"></div>
-            <h4>Магическая книга</h4>
             <div id="magic_book"></div>
-            <div id="log" style="height: 200px; width: 500px; overflow: scroll"></div>
+        </div>
+        <div id="sidebar_third" style="margin-left:30px">
+            <div id="trade_offers"></div>
+            <div id="log" style="height: 200px; width: 500px; overflow: auto"></div>
         </div>
         <div style="flex-basis: 100%; height: 0"></div>
         <div id="tile_description"></div>
     </div>
-
 </body>
 </html>

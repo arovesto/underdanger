@@ -24,9 +24,9 @@ class Player(MobileObject):
         self.name = name
         self.money = 0
         self.see = 12
-        self.possible_keys = ['move', 'nothing', 'open inventory', 'use', 'remove',
+        self.possible_keys = ['move_player', 'nothing', 'open_inventory', 'use', 'remove',
                               'info', 'showshopitems', 'trade', 'share', 'equip',
-                              'attack', 'unequip', 'magic']
+                              'use_main_weapon', "use_second_weapon" 'unequip', 'magic']
         self.inventory = []
         self.magicbook = []
         self.walkable_objects = walkable_for_players
@@ -95,7 +95,6 @@ class Player(MobileObject):
             need_points = self.points_to_go(target)
             if self.ap >= need_points:
                 self.move(target, need_points)
-                self.last_happend = self.name + ' походил'
             else:
                 self.last_happend = self.name + ' не имеет очков хода чтобы походить'
 
@@ -106,10 +105,16 @@ class Player(MobileObject):
         self.last_happend = next(
             nearby_merchant_items, self.name + ' спросил никого о торгах')
 
-    def trade(self, item_name):
+    def get_trade_offers(self):
+        for m in self.world.mobs_near(square(self.position, 2)):
+            if self.world.mobs[m].kind in traders:
+                return self.world.mobs[m].get_trade_info()
+        return None
+
+    def trade(self, item_name, merchant_name=""):
         try:
             merchant = next(self.world.mobs[m] for m in self.world.mobs_near(square(self.position, 2)) if
-                            self.world.mobs[m].kind in traders)
+                            self.world.mobs[m].kind in traders if merchant_name == "" or self.world.mobs[m].name == merchant_name)
             if item_name not in merchant.store:
                 self.last_happend = "у торговца нет " + item_name
             elif self.money < merchant.store[item_name].price:

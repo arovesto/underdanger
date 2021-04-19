@@ -1,10 +1,11 @@
+import random
 import uuid
 from threading import Lock
 from typing import Dict, Optional
 
 from flask import Flask, render_template, redirect, request, send_from_directory
-from flask_socketio import SocketIO, emit, join_room, leave_room, close_room
-from src.game.game import Game, PlayerIsDead
+from flask_socketio import SocketIO, emit, join_room, close_room, leave_room
+from src.game.game import Game
 from data import res
 
 
@@ -33,7 +34,7 @@ class Lobby:
         emit("lobby players", dict(players=list(self.players.values())), to=self.lobby_id)
 
     def start(self, starter_name):
-        if self.g is None and self.owner["username"] == starter_name:
+        if self.owner["username"] == starter_name:
             names = [p["username"] for p in self.players.values()]
             classes = [p["class"] for p in self.players.values()]
             self.g = Game(names, classes, shape)
@@ -47,8 +48,11 @@ class Lobby:
                     del self.players[n]
                     if self.g is not None:
                         self.g.remove_player(n)
+                        leave_room(self.lobby_id, sid)
                         self.update()
                     break
+            if len(self.players) == 0:
+                close_room(self.lobby_id)
 
     def empty(self):
         return len(self.players) == 0
@@ -56,23 +60,20 @@ class Lobby:
     def update(self):
         new_players = {}
         for p in self.players.values():
-            try:
-                emit("update", self.g.player_see(p["username"]), to=p["sid"])
-                new_players[p["username"]] = p
-            except PlayerIsDead:
-                emit("game over", dict(game_status="lose"), to=p["sid"])
-                leave_room(self.lobby_id, p["sid"])
+            emit("update", self.g.player_see(p["username"]), to=p["sid"])
+            new_players[p["username"]] = p
         self.players = new_players
 
     def run_action(self, player_name, action):
+        if action[0] not in res.player_possible_keys_web:
+            print("Незаконное действие:", player_name, action, "разрешены действия", res.player_possible_keys_web)
+            return
         with self.mtx:
-            print(self.g.active_player_name)
             game_status = self.g.get_status()
             if game_status != "in_progress":
                 emit("game over", dict(message="game-long-over", game_status=game_status), to=request.sid)
                 return
             if self.g.active_player_name == player_name:
-                self.g.run_checks()
                 self.g.run_action(action)  # TODO validate action - gatther all possible action and check action
                 if self.g.who_action != "игрок":
                     self.g.run_mech()
@@ -82,7 +83,6 @@ class Lobby:
                 game_status = self.g.get_status()
                 if game_status != "in_progress":
                     emit("game over", dict(message="game-over", game_status=game_status), to=self.lobby_id)
-                    close_room(self.lobby_id)
 
 
 app = Flask(__name__)
@@ -106,9 +106,9 @@ def handle_404(e):
     return redirect("/")
 
 
-@app.route("/info")
+@app.route("/static_info")
 def info():
-    return dict(classes=res.classes)
+    return dict(classes=res.classes, names=res.names, random_name=random.choice(res.names))
 
 
 @socket.on("new room")

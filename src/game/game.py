@@ -5,10 +5,6 @@ from data.res import win_words, small_controls
 from src.geometry.geometry import square, merge
 
 
-class PlayerIsDead(BaseException):
-    pass
-
-
 class Game:
     def __init__(self, names, classes, shape):
         assert len(names) > 0, 'You can use only positive number of players'
@@ -21,6 +17,7 @@ class Game:
         self.shape = shape
         self.treat_radius = 9
         self.mobs_moving_times = 1
+        self.dead_players = set()
 
         board, start_position, exit_position = generate_game_board(shape)
         self.world = World()
@@ -116,11 +113,16 @@ class Game:
     def remove_dead_players(self):
         if len(self.world.players.values()) == 0:
             return
+        new_player_names = []
         for name in self.players_names:
             if 'убил игрока ' + name in self.log:
-                self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
-                self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
-                self.players_names.remove(name)
+                self.dead_players.add(name)
+                if name == self.active_player_name:
+                    self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
+                    self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
+            else:
+                new_player_names.append(name)
+        self.players_names = new_player_names
 
     def plot(self):
         return self.active_player.plot()
@@ -142,17 +144,16 @@ class Game:
                 player = p
                 break
         if player is None:
-            raise PlayerIsDead()
+            player = self.active_player
         rendered_map, tile_descriptions = player.plot_for_web()
         stats_visual = [p.stats().replace("\n", "<br>") for p in sorted(self.world.players.values(), key=lambda x: x.name)]
-        print('magic_book', player.magicbook)
         return dict(
-            is_alive=True,
+            dead_players=list(sorted(self.dead_players)),
             tile_descriptions=tile_descriptions,
             visual=rendered_map,
             stats_visual=stats_visual,
             last_happened=player.last_happend,
-            log=self.log.replace('\n', '<br>'),
+            log=self.log.strip().replace('\n', '<br>'),
             is_active=self.active_player_name == player.name,
             players_names=self.players_names,
             active_player_name=self.active_player_name,
@@ -169,5 +170,6 @@ class Game:
             inventory=player.inventory_for_web(),
             magicbook=[i.info() for i in player.magicbook],
             equipment=[dict(part=part, info=i.info()) if i is not None
-                       else dict(part=part, info=None) for part, i in sorted(player.equipment.items(), key=lambda x: x[0])]
+                       else dict(part=part, info=None) for part, i in sorted(player.equipment.items(), key=lambda x: x[0])],
+            trade_offers=player.get_trade_offers(),
         )

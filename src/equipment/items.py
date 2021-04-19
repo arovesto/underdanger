@@ -3,6 +3,7 @@ from src.geometry.direction import where_to_go
 from src.equipment.magic import small_ring, blindness, sleeppy
 from data.res import proper_magicians, proper_warrior
 from src.equipment.armor import heavy_armor
+from src.util.words import name_to_genitive
 
 
 class Item:
@@ -80,7 +81,7 @@ class APRestorePotion(Item):
     def use(self, user):
         self.remove(user)
         user.ap = user.max_ap
-        return '{} AP были восстановлены'.format(user.name)
+        return 'AP {} были восстановлены'.format(name_to_genitive(user.name))
 
 
 class HealthSpeedPotion(Item):
