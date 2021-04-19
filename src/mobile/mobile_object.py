@@ -27,7 +27,7 @@ class MobileObject:
         return '\n' + self.show() + ' отдыхает'
 
     def show(self):
-        return '{} {}, HP = {}, AP = {}'.format(self.kind.capitalize(), self.name, str(self.hp), str(self.ap))
+        return '{} {} HP=({}/{}) AP=({}/{}) LVL={}'.format(self.kind.capitalize(), self.name, self.hp, self.max_hp, self.ap, self.max_ap, self.level)
 
     def drop_award(self):
         return ''

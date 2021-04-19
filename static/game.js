@@ -4,7 +4,6 @@ $(document).ready(function () {
     socket.emit("disconnect from room")
     let username = "";
     let class_ = "";
-    let lobbyStarter = false;
 
     $( window ).unload(function() {
         console.log("disconnect unload")
@@ -48,8 +47,9 @@ $(document).ready(function () {
             $("#tile_description").empty();
         });
     socket.on('lobby players', function (msg) {
-        $("#users").empty()
-        $("#sidebar_left").show()
+        $("#users").empty();
+        $("#sidebar_left").show();
+        console.log(msg);
         msg.players.forEach(function (val) {
             $('#users').append('<li>' + val.username + "</li>");
         })
@@ -69,7 +69,6 @@ $(document).ready(function () {
                 $("#tile_description").empty();
             });
         $('#create_room_button').unbind("click").click(function (event) {
-            lobbyStarter = true;
             socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username});
             return false
         })
@@ -168,11 +167,7 @@ $(document).ready(function () {
     })
     socket.on("game over", function (msg) {
         $("#tile_description").empty();
-
         $(document).unbind('keydown');
-        if (lobbyStarter) {
-            $("#play_again_button").show()
-        }
 
         if (msg.game_status === 'win') {
             $("#game_over_text").text('Вы нашли выход из подземелья!');
@@ -360,11 +355,7 @@ $(document).ready(function () {
         return false;
     });
     $("#play_again_button").click(function () {
-        if (lobbyStarter) {
-            console.log("restarting game")
-            socket.emit("start", {lobby_id: lobbyID, username: username});
-        } else {
-            console.log("non lobby strater pressed play again button")
-        }
+        console.log("restarting game");
+        socket.emit("start", {lobby_id: lobbyID, username: username});
     })
 });

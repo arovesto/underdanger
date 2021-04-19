@@ -285,14 +285,14 @@ class Player(MobileObject):
                     line += '▒▒'
                 elif self.world.is_occupied((i, j)):
                     tile_id = f"tile_{i}_{j}"
-                    descriptions[tile_id] = self.world.mobs[(i, j)].kind
+                    descriptions[tile_id] = self.world.mobs[(i, j)].show()
                     style = ""
                     if self.world.board.is_inside((i, j)):
                         style = self.world.board.square((i, j)).style
                     line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.mobs[(i, j)].look}</span>"
                 elif self.world.is_drop((i, j)):
                     tile_id = f"tile_{i}_{j}"
-                    descriptions[tile_id] = self.world.drop[(i, j)][-1].kind
+                    descriptions[tile_id] = str(self.world.drop[(i, j)][-1])
                     style = ""
                     if self.world.board.is_inside((i, j)):
                         style = self.world.board.square((i, j)).style

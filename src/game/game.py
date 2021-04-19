@@ -53,6 +53,7 @@ class Game:
 
     def run_action(self, action):
         self.log = ''
+        self.active_player.last_happend = ""
         act, *args = action
         if action != 'Not command':
             if action == "controls":

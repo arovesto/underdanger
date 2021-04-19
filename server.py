@@ -29,19 +29,26 @@ class Lobby:
             return
         join_room(self.lobby_id)
         self.players[player["username"]] = player
-        emit("lobby players", dict(players=list(self.players.values())), to=self.lobby_id)
-        if self.g is not None:
-            with self.mtx:
+
+        with self.mtx:
+            if self.g is not None and not self.g.game_over():
                 self.g.add_player(player["username"], player["class"])
                 emit("game started", to=player["sid"])
                 self.update()
-                
+            elif self.g is not None:
+                game_status = self.g.get_status()
+                emit("lobby players", dict(players=list(self.players.values())), to=player["sid"])
+                emit("game over", dict(message="game-long-over", game_status=game_status), to=player["sid"])
+            else:
+                emit("lobby players", dict(players=list(self.players.values())), to=self.lobby_id)
+
     def start(self, starter_name):
-        if self.owner["username"] == starter_name:
-            names = [p["username"] for p in self.players.values()]
-            classes = [p["class"] for p in self.players.values()]
-            self.g = Game(names, classes, shape)
-            self.update()
+        with self.mtx:
+            if self.g is None or self.g.game_over():
+                names = [p["username"] for p in self.players.values()]
+                classes = [p["class"] for p in self.players.values()]
+                self.g = Game(names, classes, shape)
+                self.update()
         return self.g
 
     def remove_player(self, sid):
@@ -90,7 +97,7 @@ class Lobby:
 
 app = Flask(__name__)
 socket = SocketIO(app)
-shape = (100, 100)
+shape = (250, 250)
 lobbies = dict()
 
 
