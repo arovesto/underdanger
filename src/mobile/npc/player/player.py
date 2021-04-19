@@ -265,11 +265,17 @@ class Player(MobileObject):
                 elif self.world.is_occupied((i, j)):
                     tile_id = f"tile_{i}_{j}"
                     descriptions[tile_id] = self.world.mobs[(i, j)].kind
-                    line += f"<span class='map_tile' id='{tile_id}'>{self.world.mobs[(i, j)].look}</span>"
+                    style = ""
+                    if self.world.board.is_inside((i, j)):
+                        style = self.world.board.square((i, j)).style
+                    line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.mobs[(i, j)].look}</span>"
                 elif self.world.is_drop((i, j)):
                     tile_id = f"tile_{i}_{j}"
                     descriptions[tile_id] = self.world.drop[(i, j)].kind
-                    line += f"<span class='map_tile' id='{tile_id}'>{self.world.drop[(i, j)].look}</span>"
+                    style = ""
+                    if self.world.board.is_inside((i, j)):
+                        style = self.world.board.square((i, j)).style
+                    line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.drop[(i, j)].look}</span>"
                 elif self.world.board.is_inside((i, j)):
                     tile_id = f"tile_{i}_{j}"
                     descriptions[tile_id] = self.world.board.square((i, j)).description
