@@ -70,7 +70,7 @@ class Blindness(Magic):
         self.user.ap -= self.cost
         for m in self.user.world.mobs_near(circle(self.user.position, self.range)):
             if self.user.world.mobs[m].kind in self.user.opponents:
-                self.user.world.mobs[m].see = self.effect
+                self.user.world.mobs[m].see -= self.effect
                 self.user.world.mobs[m].state = 'observe'
         self.user.magicbook.remove(self)
         return " ослепил противников"
@@ -100,7 +100,7 @@ class Sleepy(Magic):
         return " усыпил противников"
 
 
-def blindness(cost=3, effect=2): return Blindness(name='ослепление', cost=cost, effect=effect)
+def blindness(cost=3, effect=6): return Blindness(name='ослепление', cost=cost, effect=effect)
 
 
 def small_ring(range_=5): return MagicRing(name='кольцо', range_=range_)

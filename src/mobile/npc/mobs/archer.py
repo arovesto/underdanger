@@ -69,12 +69,16 @@ class Archer(Npc):
                 else:
                     self.last_happend = ''
                     self.do_move_to([self.player.position])
+        elif self.state == "observe":
+            self.state = "observe"
+            self.last_happend = "\n" + self.show() + " потерял игрока из виду"
         else:
             self.ap = 0
 
     def level_up(self):
         self.level += 1
         self.max_hp += 1
+        self.hp = self.max_hp
         if self.level % 2 == 0: self.max_ap += 1
         if self.level % 3 == 0: self.die_exp += 1
         if self.level == 4: self.bow = better_archer_bow().equip(self)

@@ -53,12 +53,16 @@ class Warrior(Npc):
                 else:
                     self.do_random_move()
                     self.last_happend = ''
+        elif self.state == 'attack':
+            self.state = "observe"
+            self.last_happend = "\n" + self.show() + " потерял игрока из виду"
         else:
-            self.ap = 0
+            self.do_random_move()
 
     def level_up(self):
         self.level += 1
         self.max_hp += 2
+        self.hp = self.max_hp
         if self.level < 6: self.see += 1
         if self.level % 3 == 0: self.die_exp += 1
         if self.level % 2 == 0: self.max_ap += 1

@@ -238,7 +238,7 @@ def standard_speed_potion(): return SpeedPotion(1, name='ускорение')
 def big_speed_potion(): return SpeedPotion(2, name='большое ускорение')
 
 
-def scroll_of_blindness(): return Scroll("свиток ослепления", blindness(), blindness(2, 1))
+def scroll_of_blindness(): return Scroll("свиток ослепления", blindness(), blindness(2, 10))
 
 
 def scroll_of_ring(): return Scroll("свиток кольца", small_ring(), small_ring(7))

@@ -146,7 +146,7 @@ class World:
         # FIXME not optimized for in-square only
         for m in self.mobs.values():
             if m.kind in npc: m.level_up()
-        # Use lazy computations, add set-level to npcs, and set it to the needed level
+        # Use lazy computations, add set-level to npcs, and set it to the needed level as loaded
         self.mob_level += 1
 
     def nearest_exit_to(self, position):
