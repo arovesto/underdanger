@@ -194,7 +194,7 @@ $(document).ready(function () {
         })
         let plt = $("#plot");
         plt.empty();
-        plt.append('<p style="font-family:\'Consolas\', monospace;white-space: pre-wrap">' + msg.visual + '</p>');
+        plt.append('<p style="font-family:\'Dejavu Sans Mono\', monospace;white-space: pre-wrap">' + msg.visual + '</p>');
 
         let inventory = $("#inventory");
         inventory.empty();
