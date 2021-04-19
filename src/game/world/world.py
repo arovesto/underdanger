@@ -29,7 +29,6 @@ class World:
 
     def add_players(self, names, classes, position):
         pos = position
-        self.players_count = len(names)
         for name, class_ in zip(names, classes):
             player = self.create_player(pos, class_, name)
             try:
@@ -50,6 +49,12 @@ class World:
         for _ in range(mob_count):
             create = getattr(self, 'create_' + random.choice(list_of_mobs))
             create(self.random_empty_position())
+
+    def place_drop(self, item, position):
+        if position in self.drop:
+            self.drop[position].append(item)
+        else:
+            self.drop[position] = [item]
 
     def add(self, entity, position):
         entity.position = position
@@ -82,7 +87,7 @@ class World:
         return position in self.drop
 
     def items_names(self, positions):
-        return ', '.join(self.drop[p].name for p in positions)
+        return ', '.join(d.name for p in positions for d in self.drop[p])
 
     def is_occupied(self, position):
         return position in self.mobs

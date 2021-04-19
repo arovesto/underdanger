@@ -208,7 +208,7 @@ $(document).ready(function () {
         }
         msg.inventory.forEach(function (val, i) {
             let item_name = "inventory_item_" + i
-            inventory.append('<li id="' + item_name + '">' + val.name + ' (' + val.count + ')</li>')
+            inventory.append('<li id="' + item_name + '" >' + val.name + ' (' + val.count + ')</li>')
             $("#" + item_name)
                 .mouseover(function () {
                     $(this).css("background", "yellow")
@@ -218,13 +218,23 @@ $(document).ready(function () {
                     $(this).css("background", "none")
                     $("#tile_description").empty();
                 })
-                .click(function (event) {
+                .click(function () {
                     $("#tile_description").empty();
                     socket.emit("move", {
-                        username: username,
-                        action: ["equip_or_use", val.name],
-                        lobby_id: lobbyID
+                                username: username,
+                                action: ["equip_or_use", val.name],
+                                lobby_id: lobbyID
                     });
+                    return false
+                })
+                .contextmenu(function () {
+                    $("#tile_description").empty();
+                    socket.emit("move", {
+                                username: username,
+                                action: ["drop_on_world", val.name],
+                                lobby_id: lobbyID
+                    });
+                    return false
                 });
         });
         let equipment = $("#equipment");

@@ -4,13 +4,13 @@ from collections import Counter
 from src.geometry.direction import DIRS
 from src.mobile.mobile_object import MobileObject
 from data.res import walkable_for_players, npc, max_armor_value, traders
-from src.geometry.geometry import distance, square
+from src.geometry.geometry import distance, square, manhattan, ring
 
 
 class Player(MobileObject):
     window_height = 21
     window_width = 31
-    pickup_distance = 2
+    pickup_distance = 1
     talking_distance = 2
     max_hp = 0
     max_ap = 0
@@ -214,14 +214,30 @@ class Player(MobileObject):
         except StopIteration:
             self.last_happend = self.name + ' не имеет ' + magic_name
 
+    def drop_on_world(self, item_name):
+        try:
+            item = next(i for i in self.inventory if i.name == item_name)
+        except StopIteration:
+            self.last_happend = self.name + ' не имеет ' + item_name
+        else:
+            try:
+                pos = next(p for p in ring(self.position, self.pickup_distance + 1, self.pickup_distance + 1) if
+                           self.world.can_move(self, p))
+                item.remove(self)
+                print("HERER")
+                self.world.place_drop(item, pos)
+                self.last_happend = self.name + " выбросил " + item_name + " на землю"
+            except StopIteration:
+                self.last_happend = self.name + " не может выбросить предмет потому что вокруг все занято"
+
     def pick_up_item(self):
         positions = [position for position in self.world.drop
-                     if distance(self.position, position) <= self.pickup_distance]
+                     if manhattan(self.position, position) <= self.pickup_distance]
 
         pick_up_message = ('\n{} поднял {}'.format(self.name, self.world.items_names(positions))
                            if len(positions) > 0 else '')
         for position in positions:
-            self.inventory.append(self.world.drop[position])
+            self.inventory.extend(self.world.drop[position])
             del self.world.drop[position]
         return pick_up_message
 
@@ -240,7 +256,7 @@ class Player(MobileObject):
                 elif self.world.is_occupied((i, j)):
                     line += self.world.mobs[(i, j)].look
                 elif self.world.is_drop((i, j)):
-                    line += self.world.drop[(i, j)].look
+                    line += self.world.drop[(i, j)][-1].look
                 elif self.world.board.is_inside((i, j)):
                     line += self.world.board.square((i, j)).look
                 else:
@@ -271,11 +287,11 @@ class Player(MobileObject):
                     line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.mobs[(i, j)].look}</span>"
                 elif self.world.is_drop((i, j)):
                     tile_id = f"tile_{i}_{j}"
-                    descriptions[tile_id] = self.world.drop[(i, j)].kind
+                    descriptions[tile_id] = self.world.drop[(i, j)][-1].kind
                     style = ""
                     if self.world.board.is_inside((i, j)):
                         style = self.world.board.square((i, j)).style
-                    line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.drop[(i, j)].look}</span>"
+                    line += f"<span class='map_tile' id='{tile_id}' style='{style}'>{self.world.drop[(i, j)][-1].look}</span>"
                 elif self.world.board.is_inside((i, j)):
                     tile_id = f"tile_{i}_{j}"
                     descriptions[tile_id] = self.world.board.square((i, j)).description

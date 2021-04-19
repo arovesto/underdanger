@@ -12,6 +12,7 @@ class MobileObject:
     already_moved = False
     look = "?!"
     kind = "mob"
+    name = "noname"
 
     def __init__(self, kind='mob', look=''):
         self.kind = kind
@@ -67,7 +68,7 @@ class MobileObject:
             del self.world.players[self.position]
         killer.kill_count += 1
         killer.exp += self.die_exp
-        if self.kind == 'игрок': return " убил игрока {}. он оставил {}".format(self.name, self.drop_award())
+        if self.kind == 'игрок': return " убил игрока {}".format(self.name)
         return ' убил {} {}. он оставил {}'.format(self.kind, self.name, self.drop_award())
 
     def points_to_go(self, position):

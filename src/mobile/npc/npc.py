@@ -22,7 +22,7 @@ class Npc(MobileObject):
         chosen = random.random()
         try:
             item = next(i for prob, i in self.drop.items() if prob[0] < chosen <= prob[1])
-            self.world.drop[self.position] = item
+            self.world.place_drop(item, self.position)
             return item.name
         except StopIteration:
             return 'ничего'

@@ -30,5 +30,9 @@ def circle(position, radius):
     return set(filter(lambda x: distance(x, position) <= radius, square(position, radius)))
 
 
+def ring(position, inner, outer):
+    return set(filter(lambda x: inner <= distance(x, position) <= outer, square(position, outer)))
+
+
 def merge(shapes):
     return set(itertools.chain.from_iterable(shapes))

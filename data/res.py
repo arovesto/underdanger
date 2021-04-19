@@ -28,7 +28,7 @@ names = [
 
 positive = ["Да", "Yes", "да", "д", "y", "yes", ""]
 
-player_possible_keys_web = {"use_main_weapon", "use_second_weapon", "move_player", "trade", "nothing", "equip_or_use", "unequip", "magic"}
+player_possible_keys_web = {"use_main_weapon", "use_second_weapon", "move_player", "trade", "nothing", "equip_or_use", "unequip", "magic", "drop_on_world"}
 
 list_of_under_mobs_objects = ['floor'] * 10 + ['grass'] * 2
 
