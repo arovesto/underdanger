@@ -1,6 +1,7 @@
 from src.game.world.world import World
 from src.game.world.board.board import generate_game_board
 from data.res import win_words, small_controls
+from src.util.words import name_to_genitive
 
 from src.geometry.geometry import square, merge
 
@@ -115,7 +116,7 @@ class Game:
             return
         new_player_names = []
         for name in self.players_names:
-            if 'убил игрока ' + name in self.log:
+            if 'убил игрока ' + name_to_genitive(name) in self.log:
                 self.dead_players.add(name)
                 if name == self.active_player_name:
                     self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]

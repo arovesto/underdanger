@@ -241,6 +241,11 @@ class Player(MobileObject):
             del self.world.drop[position]
         return pick_up_message
 
+    def drop_award(self):
+        for item in self.inventory:
+            self.world.place_drop(item, self.position)
+        return ", ".join(i.name for i in self.inventory)
+
     def plot(self):
         start_line = '\n╔' + '══' * self.window_width + '╗'
         end_line = '\n╚' + '══' * self.window_width + '╝'

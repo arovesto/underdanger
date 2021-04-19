@@ -68,8 +68,10 @@ class MobileObject:
             del self.world.players[self.position]
         killer.kill_count += 1
         killer.exp += self.die_exp
-        if self.kind == 'игрок': return " убил игрока {}".format(self.name)
-        return ' убил {} {}. он оставил {}'.format(self.kind, self.name, self.drop_award())
+        if self.kind == 'игрок':
+            self.drop_award()
+            return " убил игрока {}".format(name_to_genitive(self.name))
+        return ' убил {} {}. он оставил {}'.format(name_to_genitive(self.kind), name_to_genitive(self.name), self.drop_award())
 
     def points_to_go(self, position):
         return self.world.square_cost(position) + self.move_penalty
