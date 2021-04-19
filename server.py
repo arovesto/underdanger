@@ -96,7 +96,7 @@ class Lobby:
 
 
 app = Flask(__name__)
-socket = SocketIO(app)
+socket = SocketIO(app, cors_allowed_origins="*")
 shape = (250, 250)
 lobbies = dict()
 
