@@ -37,8 +37,10 @@ class Warrior(Npc):
         # TODO polish things here (find-lose system)
 
         if self.state == 'observe':
-            self.find_player()
-            self.awareness += 0.04
+            found = self.find_player()
+            if not found:
+                self.awareness = 1
+                self.do_random_move()
         elif self.state == 'attack' and not self.lose_player():
             self.call_for_help(self.player)
             direction = self.find_direction_on_player()
@@ -55,14 +57,15 @@ class Warrior(Npc):
                     self.last_happend = ''
         elif self.state == 'attack':
             self.state = "observe"
+            self.awareness = 2
             # self.last_happend = "\n" + self.show() + " потерял игрока из виду"
         else:
             self.do_random_move()
 
     def level_up(self):
         self.level += 1
-        if self.level % 5 == 0:
-            self.max_hp += 2
+        if self.level % 4 == 0:
+            self.max_hp += 15
         self.hp = self.max_hp
         if self.level < 6: self.see += 1
         if self.level % 3 == 0: self.die_exp += 1

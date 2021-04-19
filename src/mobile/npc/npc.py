@@ -1,8 +1,8 @@
 import random
 
 from src.mobile.mobile_object import MobileObject
-from src.geometry.geometry import distance, square
-from data.res import walkable_for_monsters
+from src.geometry.geometry import distance, circle
+from data.res import walkable_for_monsters, bad_mobs
 from src.mobile.pathfinder import path
 from src.geometry.direction import DIRS
 
@@ -78,8 +78,8 @@ class Npc(MobileObject):
 
     def call_for_help(self, player):
         how_much = 0
-        for m in self.world.mobs_near(square(self.position, self.see * 2 // 3)).values():
-            if m.kind == self.kind and self.can_see(m.position) and m is not self:
+        for m in self.world.mobs_near(circle(self.position, self.see // 2)).values():
+            if self.can_see(m.position) and m is not self and m.kind in bad_mobs:
                 m.activate(player)
                 how_much += 1
         if how_much > 0:

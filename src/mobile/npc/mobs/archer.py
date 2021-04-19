@@ -43,8 +43,10 @@ class Archer(Npc):
     def mech(self):
         # TODO polish things here (find-lose system)
         if self.state == 'observe':
-            self.find_player()
-            self.awareness += 0.04
+            found = self.find_player()
+            if not found:
+                self.awareness = 1
+                self.do_random_move()
         elif self.state == 'attack' and not self.lose_player():
             self.call_for_help(self.player)
             direction_on_target = self.find_direction_on_player()
@@ -71,14 +73,15 @@ class Archer(Npc):
                     self.do_move_to([self.player.position])
         elif self.state == "observe":
             self.state = "observe"
+            self.awareness = 2
             self.last_happend = "\n" + self.show() + " потерял игрока из виду"
         else:
             self.ap = 0
 
     def level_up(self):
         self.level += 1
-        if self.level % 10 == 0:
-            self.max_hp += 1
+        if self.level % 4 == 0:
+            self.max_hp += 5
         self.hp = self.max_hp
         if self.level % 2 == 0: self.max_ap += 1
         if self.level % 3 == 0: self.die_exp += 1

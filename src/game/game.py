@@ -16,7 +16,7 @@ class Game:
 
         self.players_names = names
         self.shape = shape
-        self.treat_radius = 9
+        self.treat_radius = 12
         self.mobs_moving_times = 1
         self.dead_players = set()
 
