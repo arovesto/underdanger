@@ -77,7 +77,8 @@ class Archer(Npc):
 
     def level_up(self):
         self.level += 1
-        self.max_hp += 1
+        if self.level % 10 == 0:
+            self.max_hp += 1
         self.hp = self.max_hp
         if self.level % 2 == 0: self.max_ap += 1
         if self.level % 3 == 0: self.die_exp += 1
