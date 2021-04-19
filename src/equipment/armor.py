@@ -46,7 +46,8 @@ class StealthCloak(Armor):
             self.user.obscurity *= 1.5
             self.block += 3
         else:
-            self.user.obscrurity *= 1.2
+            self.user.obscurity *= 1.2
+
         for part in self.bodyparts:
             self.user.equipment[part] = self
         return self
@@ -55,7 +56,7 @@ class StealthCloak(Armor):
         if self.user.class_ in proper_stealth:
             self.user.obscurity /= 1.5
         else:
-            self.user.obscrurity /= 1.2
+            self.user.obscurity /= 1.2
         for part in self.bodyparts:
             self.user.equipment[part] = None
         self.user.inventory.append(self)
@@ -93,7 +94,7 @@ def aluminium_mail(): return Armor(8, ['тело'], 'алюминиевая ко
 def heavy_armor(): return Armor(12, ['тело'], "тяжелейшая броня")
 
 
-def magic_tunic(): return MagicArmor(4, ["trunk"], "волшебная туника", description="Волшебнику это понравится")
+def magic_tunic(): return MagicArmor(4, ["тело"], "волшебная туника", description="Волшебнику это понравится")
 
 
 def stealth_cloak(): return StealthCloak(4, ['тело'], "плащ невидимости",
