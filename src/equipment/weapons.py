@@ -95,7 +95,7 @@ class Bow(Weapon):
 
 
 class Whip(Weapon):
-    bodyparts = ["offhand"]
+    bodyparts = ["дополнительное"]
     look = '(.'
 
     def __init__(self, name='хлыст', damage=5, cost=2, range_=3):
@@ -157,7 +157,7 @@ def metal_bow(): return Bow(damage=15, cost=5, range_=range(10), name='хоро�
 def spear(): return Spear(name="копье", damage=6, cost=2, range_=2)
 
 
-def whip(): return Whip(name="хлыст", damage=3, cost=2, range_=3)
+def whip(): return Whip(name="хлыст", damage=5, cost=2, range_=3)
 
 
 SwordOfSaintPeter = Knife(name='супермеч', damage=12, cost=4)
