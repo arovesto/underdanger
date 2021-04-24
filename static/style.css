@@ -1,0 +1,95 @@
+/* MAIN */
+body {
+    font-family: 'Roboto Mono', monospace !important;;
+    font-kerning:none !important;;
+    background-color: blanchedalmond !important;;
+}
+
+.chrome_canvas {
+    letter-spacing: 0.5px;
+    line-height: 16px;
+}
+
+.firefox_canvas {
+    line-height: 18px;
+}
+
+
+/* TOP BAR */
+#topbar {
+    display: none;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 15px 10px 10px 15px;
+}
+
+#users {
+    display: inline-flex;
+    justify-content: flex-start;
+}
+
+#users_title {
+    color: darkgreen;
+    font-weight: bold;
+}
+
+.username {
+    margin-right: 10px;
+}
+
+.active_user {
+    background: cornflowerblue
+}
+
+.dead_user {
+    background: darkgray
+}
+
+/* MENU */
+
+#menu {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#menu_center {
+    width: 800px;
+    background-color: white;
+    padding: 30px;
+}
+
+#help {
+    font-size: 0.8em;
+}
+
+/* GAME FIELD*/
+
+#game_field {
+    display: none;
+    cursor: default;
+    flex-flow: row wrap;
+}
+
+
+/* SIDEBAR THIRD */
+
+#log {
+    height: 200px; width: 500px; overflow: auto;
+    border: 3px slategrey double;
+}
+
+
+/* FOOTER */
+
+#tile_description {
+    height: 30px;
+}
+
+#footer {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: center;
+    font-size: smaller;
+}

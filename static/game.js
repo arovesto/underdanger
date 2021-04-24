@@ -5,6 +5,12 @@ $(document).ready(function () {
     let username = "";
     let class_ = "";
 
+    if (window.chrome) {
+        $('#canvas').addClass("chrome_canvas");
+    } else {
+        $('#canvas').addClass("firefox_canvas");
+    }
+
     $( window ).unload(function() {
         console.log("disconnect unload")
         socket.emit("disconnect from room")
@@ -47,18 +53,36 @@ $(document).ready(function () {
             $("#tile_description").empty();
         });
     socket.on('lobby players', function (msg) {
-        $("#users").empty();
-        $("#sidebar_left").show();
-        console.log(msg);
+        $("#current_room_users").empty().append('<span>Игроки в текущей комнате: </span>');
+
         msg.players.forEach(function (val) {
-            $('#users').append('<li>' + val.username + "</li>");
+            $('#current_room_users').append('<span class="username">' + val.username + "</span>");
         })
     })
+    socket.on("join success", function () {
+         $('form#join :input').hide()
+        $("#create_room_button").hide()
+    })
     socket.on("error", function (msg) {
+        switch (msg.errtype) {
+            case "room_not_found": {
+                $("#lobby_id").addClass("is-invalid")
+                $("#lobby_id_form_error").empty().append(msg.message)
+                break
+            }
+            case "duplicate_username": {
+                $("#username").addClass("is-invalid")
+                $("#username_form_error").empty().append(msg.message)
+                break
+            }
+        }
         console.log(msg);
         // TODO log msg.message + msg.status here like "error happened"
     })
     socket.on("lobby created", function (msg) {
+        $("#lobby_code").empty().append('Отправьте это своему другу чтобы он присоединился <span>' + msg.id + "</span>")
+        $("#username_form_error").empty()
+        $("#lobby_id_form_error").empty()
         let lobby = $("#lobby_id");
         lobby.val(msg.id);
         $('#create_room_button').val("Начать игру");
@@ -71,13 +95,14 @@ $(document).ready(function () {
         $('#create_room_button').unbind("click").click(function (event) {
             socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username});
             return false
-        })
+        }).show()
     })
     socket.on("game started", function (msg) {
+        $("#username_form_error").empty()
         if (lobbyID === "") {
             lobbyID = $("#lobby_id").val()
         }
-        $("#game_field").css("background", "blanchedalmond");;
+        $("#game_field").css('display', 'flex');
         $("#game_over").hide();
         $("#menu").empty()
         $("#log").empty();
@@ -86,18 +111,22 @@ $(document).ready(function () {
             event.preventDefault();
             let action = undefined;
             switch (event.key) {
+                case "w":
                 case 'ArrowUp': {
                     action = "up";
                     break
                 }
+                case "s":
                 case 'ArrowDown': {
                     action = "down";
                     break
                 }
+                case "a":
                 case 'ArrowLeft': {
                     action = "left";
                     break
                 }
+                case "d":
                 case 'ArrowRight': {
                     action = "right";
                     break
@@ -184,17 +213,17 @@ $(document).ready(function () {
         $("#users").empty();
         msg.players_names.forEach(function (val) {
             if (val === msg.active_player_name) {
-                $('#users').append('<p style="background: cornflowerblue">' + val + "</p>");
+                $('#users').append('<span class="username active_user">' + val + "</span>");
             } else {
-                $('#users').append('<p>' + val + "</p>");
+                $('#users').append('<span class="username">' + val + "</span>");
             }
         })
         msg.dead_players.forEach(function (val) {
-            $('#users').append('<p style="background: darkgray">' + val + "</p>");
+            $('#users').append('<span class="username dead_user">' + val + "</span>");
         })
-        let plt = $("#plot");
+        let plt = $("#canvas");
         plt.empty();
-        plt.append('<p style="font-family:\'Dejavu Sans Mono\', monospace;white-space: pre-wrap">' + msg.visual + '</p>');
+        plt.append(msg.visual);
 
         let inventory = $("#inventory");
         inventory.empty();
@@ -327,6 +356,8 @@ $(document).ready(function () {
     })
     $("form#join").submit(function() { return false; });
     $('#connect_room_button').click(function (event) {
+        $("#username").removeClass("is-invalid")
+        $("#lobby_id").removeClass("is-invalid")
         username = $("#username").val()
         class_ = $("#class").val()
         lobbyID = $('#lobby_id').val()
@@ -334,7 +365,6 @@ $(document).ready(function () {
             // TODO - say "you need to specify username and class beforehand" here
             return false
         }
-        $('form#join :input').prop("disabled", true)
         socket.emit('join', {
             username: username,
             class: class_,
@@ -349,8 +379,6 @@ $(document).ready(function () {
             // TODO - say "you need to specify username and class beforehand" here
             return false
         }
-        $('form#join :input').prop("disabled", true)
-        $("#create_room_button").prop("disabled", false)
         socket.emit('new room', {username: username, class: class_});
         return false;
     });

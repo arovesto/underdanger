@@ -89,8 +89,11 @@ class Player(MobileObject):
     def move_player(self, direction):
         target = DIRS[direction].go(self.position)
         if not self.world.can_move(self, target):
-            self.last_happend = self.name + ' не может походить туда'
-            return
+            self.use_main_weapon(direction)
+            if "не имеет" in self.last_happend:
+                self.use_second_weapon(direction)
+            if "не имеет" in self.last_happend:
+                self.last_happend = self.name + ' не может походить туда'
         else:
             need_points = self.points_to_go(target)
             if self.ap >= need_points:

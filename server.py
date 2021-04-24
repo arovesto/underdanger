@@ -26,9 +26,11 @@ class Lobby:
 
     def enter_lobby(self, player):
         if player["username"] in self.players:
+            emit("error", dict(message="игрок с таким именем уже есть", errtype="duplicate_username"), to=request.sid)
             return
         join_room(self.lobby_id)
         self.players[player["username"]] = player
+        emit("join success", to=request.sid)
 
         with self.mtx:
             if self.g is not None and not self.g.game_over():
@@ -127,7 +129,7 @@ def new_lobby(player):
     print([e.__dict__ for e in lobbies.values()])
     print(player, request.sid)
     # { "username" : "vasya", "class", "рыцарь" }
-    lobby_id = str(uuid.uuid4()).replace('-', '')
+    lobby_id = str(uuid.uuid4()).replace('-', '')[:6]
     player["sid"] = request.sid
     lobby = Lobby(player, lobby_id)
     lobby.enter_lobby(player)
@@ -146,7 +148,7 @@ def join_lobby(player):
     if lobby_id in lobbies:
         lobbies[lobby_id].enter_lobby(player)
     else:
-        return emit("error", dict(status=404, message="lobby not found"), to=request.sid)
+        return emit("error", dict(status=404, message="комната не найдена", errtype="room_not_found"), to=request.sid)
 
 
 @socket.on("disconnect")
@@ -183,9 +185,9 @@ def start(data):
     if lobby_id in lobbies:
         g = lobbies[lobby_id].start(data.get("username"))
         if g is None:
-            return emit("error", dict(status=400, message="failed to start game"))
+            emit("error", dict(status=500, message="не удалось начать игру", errtype="game_not_started"), to=request.sid)
         return emit("game started", to=lobby_id)
-    return emit("error", dict(status=404, message="game not found"))
+    return emit("error", dict(status=404, message="комната не найдена", errtype="room_not_found"), to=request.sid)
 
 
 if __name__ == "__main__":
