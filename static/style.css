@@ -1,19 +1,27 @@
 /* MAIN */
 body {
-    font-family: 'Roboto Mono', monospace !important;;
+    font-family: 'Roboto Mono', monospace !important;
     font-kerning:none !important;;
     background-color: blanchedalmond !important;;
 }
 
 .chrome_canvas {
-    letter-spacing: 0.5px;
+    font-family: 'Mononoki Mono', monospace !important;
+    letter-spacing: -1px;
     line-height: 16px;
 }
 
 .firefox_canvas {
     line-height: 18px;
+    letter-spacing: -1px;
 }
-
+#game_field {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 /* TOP BAR */
 #topbar {
@@ -38,6 +46,10 @@ body {
 
 .active_user {
     background: cornflowerblue
+}
+
+.user_me {
+    color: blueviolet;
 }
 
 .dead_user {

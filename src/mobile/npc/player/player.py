@@ -1,7 +1,7 @@
 from math import ceil
 from collections import Counter
 
-from src.geometry.direction import DIRS
+from src.geometry.direction import DIRS, directions_on
 from src.mobile.mobile_object import MobileObject
 from data.res import walkable_for_players, npc, max_armor_value, traders
 from src.geometry.geometry import distance, square, manhattan, ring
@@ -88,12 +88,14 @@ class Player(MobileObject):
 
     def move_player(self, direction):
         target = DIRS[direction].go(self.position)
-        if not self.world.can_move(self, target):
+        if not self.world.can_move(self, target) and self.world.is_occupied(target):
             self.use_main_weapon(direction)
             if "не имеет" in self.last_happend:
                 self.use_second_weapon(direction)
             if "не имеет" in self.last_happend:
                 self.last_happend = self.name + ' не может походить туда'
+        elif not self.world.can_move(self, target):
+            self.last_happend = self.name + ' не может походить туда'
         else:
             need_points = self.points_to_go(target)
             if self.ap >= need_points:
@@ -145,6 +147,32 @@ class Player(MobileObject):
 
     def masking(self):
         return self.obscurity
+
+    def on_position_left(self, x, y):
+        pos = (int(x), int(y))
+        if pos == self.position:
+            return
+        directions = directions_on(self.position, pos)
+        for d in directions:
+            self.move_player(d)
+            if "не может походить туда" not in self.last_happend:
+                break
+        else:
+            self.last_happend = self.name + " не может походить туда"
+
+    def on_position_right(self, x, y):
+        pos = (int(x), int(y))
+        if pos == self.position:
+            return
+        dirs = directions_on(self.position, pos)
+        if len(dirs) == 0:
+            return
+        direction = dirs[0]
+        self.use_main_weapon(direction)
+        if "не имеет" in self.last_happend:
+            self.use_second_weapon(direction)
+        if "не имеет" in self.last_happend:
+            self.last_happend = self.name + " не иммеет оружия"
 
     def equip(self, item_name):
         try:
@@ -227,7 +255,6 @@ class Player(MobileObject):
                 pos = next(p for p in ring(self.position, self.pickup_distance + 1, self.pickup_distance + 1) if
                            self.world.can_move(self, p))
                 item.remove(self)
-                print("HERER")
                 self.world.place_drop(item, pos)
                 self.last_happend = self.name + " выбросил " + item_name + " на землю"
             except StopIteration:

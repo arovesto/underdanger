@@ -65,7 +65,7 @@ class Warrior(Npc):
     def level_up(self):
         self.level += 1
         if self.level % 4 == 0:
-            self.max_hp += 15
+            self.max_hp += 5
         self.hp = self.max_hp
         if self.level < 6: self.see += 1
         if self.level % 3 == 0: self.die_exp += 1

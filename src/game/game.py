@@ -136,7 +136,8 @@ class Game:
         if self.active_player_name == name:
             self.active_player_name = self.players_names[(self.players_names.index(self.active_player_name) + 1) % len(self.players_names)]
             self.active_player = next(p for p in self.world.players.values() if p.name == self.active_player_name)
-        self.players_names.remove(name)
+        if name in self.players_names:
+            self.players_names.remove(name)
         self.world.remove_player(name)
 
     def add_player(self, name, class_):

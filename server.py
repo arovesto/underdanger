@@ -62,6 +62,8 @@ class Lobby:
                         self.g.remove_player(n)
                         leave_room(self.lobby_id, sid)
                         self.update()
+                    else:
+                        emit("lobby players", dict(players=list(self.players.values())), to=self.lobby_id)
                     break
             if len(self.players) == 0:
                 close_room(self.lobby_id)
@@ -106,6 +108,11 @@ lobbies = dict()
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket.async_mode)
+
+
+@app.route("/lobby/<lobby>")
+def join_game(lobby):
+    return render_template("index.html")
 
 
 @app.route('/static/<path:path>')
@@ -173,6 +180,8 @@ def move(data):
     if lobby_id in lobbies:
         lobby = lobbies[lobby_id]
         lobby.run_action(data.get("username"), data.get("action"))
+    else:
+        return emit("error", dict(status=404, message="комната не найдена", errtype="room_not_found"))
 
 
 @socket.on("start")

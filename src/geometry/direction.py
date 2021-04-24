@@ -48,6 +48,22 @@ def where_to_go(delta):
     return "-".join(result)
 
 
+def directions_on(fr, to):
+    dt = (to[0] - fr[0], to[1] - fr[1])
+    dirs = []
+    if dt[0] > 0:
+        dirs.append("down")
+    elif dt[0] < 0:
+        dirs.append("up")
+
+    if dt[1] > 0:
+        dirs.append("right")
+    elif dt[1] < 0:
+        dirs.append("left")
+
+    return list(reversed(sorted(dirs, key=lambda x: abs(dt[dirs.index(x)]))))
+
+
 DIRS = {
     'up': UP,
     'down': DOWN,

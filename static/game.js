@@ -22,6 +22,15 @@ $(document).ready(function () {
     let playerState = 'default';
     let lobbyID = "";
 
+    if (window.location.pathname.includes("lobby")) {
+        lobbyID = window.location.pathname.split("/").pop();
+        $("#lobby_id").val(lobbyID).click(function () {$(this).unbind("click").select()});
+    }
+    if (window.location.hash.includes("lobby")) {
+        lobbyID = window.location.hash.split("/").pop();
+        $("#lobby_id").val(lobbyID).click(function () {$(this).unbind("click").select()});
+    }
+
     fetch("/static_info").then(data => { return data.json() }).then(function (data) {
         $("#username").val(data.random_name)
         data.classes.forEach(function (val) {
@@ -53,7 +62,7 @@ $(document).ready(function () {
             $("#tile_description").empty();
         });
     socket.on('lobby players', function (msg) {
-        $("#current_room_users").empty().append('<span>Игроки в текущей комнате: </span>');
+        $("#current_room_users").empty().append('<span><b>Игроки в текущей комнате:</b> </span>');
 
         msg.players.forEach(function (val) {
             $('#current_room_users').append('<span class="username">' + val.username + "</span>");
@@ -77,14 +86,15 @@ $(document).ready(function () {
             }
         }
         console.log(msg);
-        // TODO log msg.message + msg.status here like "error happened"
     })
     socket.on("lobby created", function (msg) {
-        $("#lobby_code").empty().append('Отправьте это своему другу чтобы он присоединился <span>' + msg.id + "</span>")
+        let url = window.location.protocol + "//" + window.location.host + "/lobby/" + msg.id
+        $("#lobby_code").empty().append('Отправьте эту ссылку вашему другу чтобы поиграть вместе: <a id="join_link" href="' + url + '">' + msg.id + "</a>")
         $("#username_form_error").empty()
         $("#lobby_id_form_error").empty()
         let lobby = $("#lobby_id");
         lobby.val(msg.id);
+        lobbyID = msg.id;
         $('#create_room_button').val("Начать игру");
         lobby.mouseover(function () {
                 $("#tile_description").text("скопируйте это значение своему товарищу");
@@ -96,6 +106,7 @@ $(document).ready(function () {
             socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username});
             return false
         }).show()
+        window.location.hash = "/lobby/" + msg.id
     })
     socket.on("game started", function (msg) {
         $("#username_form_error").empty()
@@ -112,21 +123,25 @@ $(document).ready(function () {
             let action = undefined;
             switch (event.key) {
                 case "w":
+                case "ц":
                 case 'ArrowUp': {
                     action = "up";
                     break
                 }
                 case "s":
+                case "ы":
                 case 'ArrowDown': {
                     action = "down";
                     break
                 }
                 case "a":
+                case "ф":
                 case 'ArrowLeft': {
                     action = "left";
                     break
                 }
                 case "d":
+                case "в":
                 case 'ArrowRight': {
                     action = "right";
                     break
@@ -213,17 +228,73 @@ $(document).ready(function () {
         $("#users").empty();
         msg.players_names.forEach(function (val) {
             if (val === msg.active_player_name) {
-                $('#users').append('<span class="username active_user">' + val + "</span>");
+                if (val === username) {
+                    $('#users').append('<span class="username active_user user_me">' + val + "</span>");
+                } else {
+                    $('#users').append('<span class="username active_user">' + val + "</span>");
+                }
+
             } else {
-                $('#users').append('<span class="username">' + val + "</span>");
+                if (val === username) {
+                    $('#users').append('<span class="username user_me">' + val + "</span>");
+                } else {
+                    $('#users').append('<span class="username">' + val + "</span>");
+                }
             }
         })
         msg.dead_players.forEach(function (val) {
-            $('#users').append('<span class="username dead_user">' + val + "</span>");
+            if (val === username) {
+                $('#users').append('<span class="username dead_user user_me">' + val + "</span>");
+            } else {
+                $('#users').append('<span class="username dead_user">' + val + "</span>");
+            }
+
         })
         let plt = $("#canvas");
         plt.empty();
         plt.append(msg.visual);
+        plt.append('<p>' + msg.stats_visual.join("<br>") + '</p>')
+        $(".map_tile")
+            .mouseover(function () {
+                let tileId = $(this).attr('id');
+                $("#tile_description").text(tileDescriptions[tileId]);
+                $(this).css("outline", "solid yellow").css("outline-offset", "-3px")
+            })
+            .mouseout(function () {
+                $("#tile_description").empty();
+                $(this).css("outline", "")
+            })
+            .click(function () {
+                $("#tile_description").empty();
+                let cls = $(this).attr("id");
+                if (!cls) {
+                    return
+                }
+                let items = cls.split("_");
+                let i = parseInt(items[items.length - 2]);
+                let j = parseInt(items[items.length - 1]);
+                socket.emit("move", {
+                    username: username,
+                    action: ["on_position_left", i, j],
+                    lobby_id: lobbyID,
+                })
+            })
+            .contextmenu(function () {
+                $("#tile_description").empty();
+                let cls = $(this).attr("id");
+                if (!cls) {
+                    return false
+                }
+                let items = cls.split("_")
+                let i = parseInt(items[items.length - 2]);
+                let j = parseInt(items[items.length - 1]);
+                socket.emit("move", {
+                    username: username,
+                    action: ["on_position_right", i, j],
+                    lobby_id: lobbyID,
+                });
+                return false;
+            })
 
         let inventory = $("#inventory");
         inventory.empty();
@@ -343,16 +414,6 @@ $(document).ready(function () {
         }
         let log = $("#log");
         log.append('<p>' + msg.log + '</p>').scrollTop(log[0].scrollHeight);
-
-        plt.append('<p style="white-space: pre-wrap">' + msg.stats_visual.join("<br>") + '</p>')
-        $(".map_tile")
-            .mouseover(function () {
-                let tileId = $(this).attr('id');
-                $("#tile_description").text(tileDescriptions[tileId]);
-            })
-            .mouseout(function () {
-                $("#tile_description").empty();
-            });
     })
     $("form#join").submit(function() { return false; });
     $('#connect_room_button').click(function (event) {
@@ -375,15 +436,18 @@ $(document).ready(function () {
     $('#create_room_button').click(function (event) {
         username = $("#username").val()
         class_ = $("#class").val()
-        if (username === "" || class_ === "") {
-            // TODO - say "you need to specify username and class beforehand" here
+        if (username === "") {
+            $("#username").addClass("is-invalid");
+            $("#username_form_error").empty().append("имя не должно быть пустым");
             return false
         }
+
         socket.emit('new room', {username: username, class: class_});
         return false;
     });
     $("#play_again_button").click(function () {
         console.log("restarting game");
         socket.emit("start", {lobby_id: lobbyID, username: username});
+        return false
     })
 });
