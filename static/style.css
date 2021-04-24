@@ -9,11 +9,13 @@ body {
     font-family: 'Mononoki Mono', monospace !important;
     letter-spacing: -1px;
     line-height: 16px;
+    font-size: larger;
 }
 
 .firefox_canvas {
     line-height: 18px;
     letter-spacing: -1px;
+    font-size: large;
 }
 #game_field {
     -webkit-touch-callout: none;
