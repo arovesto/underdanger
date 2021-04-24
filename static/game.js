@@ -361,7 +361,7 @@ $(document).ready(function () {
         username = $("#username").val()
         class_ = $("#class").val()
         lobbyID = $('#lobby_id').val()
-        if (username === "" || class_ === "" || lobbyID === "") {
+        if (username === "" || class_ === "") {
             // TODO - say "you need to specify username and class beforehand" here
             return false
         }

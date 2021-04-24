@@ -17,7 +17,6 @@ body {
 
 /* TOP BAR */
 #topbar {
-    display: none;
     flex-wrap: nowrap;
     width: 100%;
     padding: 15px 10px 10px 15px;
@@ -76,7 +75,7 @@ body {
 
 #log {
     height: 200px; width: 500px; overflow: auto;
-    border: 3px slategrey double;
+    background-color: bisque;
 }
 
 
