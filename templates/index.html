@@ -19,6 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/98.css@0.1.4/build/98.css" />
 </head>
 <body>
 <div id="menu">
@@ -38,14 +39,14 @@
                     <div class="mb-3">
                         <div class="row">
                             <div class="col">
-                                <input class="form-control" type="text" name="username"
+                                <input class="form-control sharp" type="text" name="username"
                                        id="username"
                                        placeholder="Имя игрока"
                                        value="Джеймс">
                                 <div id="username_form_error" class="invalid-feedback"></div>
                             </div>
                             <div class="col">
-                                <select size="1" name="class" id="class" class="form-select">
+                                <select size="1" name="class" id="class" class="form-select sharp">
                                 </select>
                             </div>
                         </div>
@@ -53,13 +54,13 @@
                 </div>
                 <div class="container">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control"
+                        <input type="text" class="form-control sharp"
                                placeholder="ID комнаты"
                                aria-label="ID комнаты"
                                aria-describedby="button-addon2"
                                name="lobby_id" id="lobby_id">
                         <span class="input-group-btn">
-                            <button class="btn btn-outline-secondary" type="button"
+                            <button class="btn btn-outline-secondary sharp" type="button"
                                     name="connect_play"
                                     id="connect_room_button">Присоединиться к комнате
                             </button>
@@ -72,7 +73,7 @@
                         <div class="mb-3">
                             <input type="submit" id="create_room_button"
                                    value="Создать новую комнату"
-                                   class="btn btn-outline-primary">
+                                   class="btn btn-outline-primary sharp">
                         </div>
                     </div>
                 </div>

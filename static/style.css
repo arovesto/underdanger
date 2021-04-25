@@ -23,6 +23,10 @@ body {
     user-select: none;
 }
 
+.sharp {
+  border-radius:0 !important;
+}
+
 /* TOP BAR */
 #topbar {
     flex-wrap: nowrap;
