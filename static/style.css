@@ -1,8 +1,9 @@
 /* MAIN */
 body {
     font-family: 'Roboto Mono', monospace !important;
-    font-kerning:none !important;;
-    background-color: blanchedalmond !important;;
+    font-kerning:none !important;
+    font-size: 16px !important;
+    background-color: blanchedalmond !important;
 }
 
 .chrome_canvas {
@@ -15,12 +16,9 @@ body {
     line-height: 18px;
     font-size: large;
 }
-#game_field {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+
+#tile_description {
+    display: block;
 }
 
 .sharp {
@@ -81,6 +79,11 @@ body {
 /* GAME FIELD*/
 
 #game_field {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     display: none;
     cursor: default;
     flex-flow: row wrap;

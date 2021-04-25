@@ -40,10 +40,10 @@ $(document).ready(function () {
 
      $("#class")
         .mouseover(function () {
-            $("#tile_description").text("вы можете выбрать один из классов: рыцарь, лучник, волшебник");
+            $("#menu_status_bar").text("вы можете выбрать один из классов: рыцарь, лучник, волшебник");
         })
         .mouseout(function () {
-            $("#tile_description").empty();
+            $("#menu_status_bar").empty();
         });
      $("#username")
         .mouseover(function () {
@@ -56,10 +56,10 @@ $(document).ready(function () {
         });
     $("#lobby_id")
         .mouseover(function () {
-            $("#tile_description").text("вставьте ID комнаты вашего друга");
+            $("#menu_status_bar").text("вставьте ID комнаты вашего друга");
         })
         .mouseout(function () {
-            $("#tile_description").empty();
+            $("#menu_status_bar").empty();
         });
     socket.on('lobby players', function (msg) {
         $("#current_room_users").empty().append('<span><b>Игроки в текущей комнате:</b> </span>');
@@ -90,22 +90,20 @@ $(document).ready(function () {
     socket.on("lobby created", function (msg) {
         let url = window.location.protocol + "//" + window.location.host + "/lobby/" + msg.id
         $("#lobby_code").empty().append('Отправьте эту ссылку вашему другу чтобы поиграть вместе: <a id="join_link" href="' + url + '">' + msg.id + "</a>")
-        $("#username_form_error").empty()
-        $("#lobby_id_form_error").empty()
-        let lobby = $("#lobby_id");
-        lobby.val(msg.id);
-        lobbyID = msg.id;
-        $('#create_room_button').val("Начать игру");
-        lobby.mouseover(function () {
-                $("#tile_description").text("скопируйте это значение своему товарищу");
+        $("#join_link").mouseover(function () {
+                $("#menu_status_bar").text("скопируйте это значение своему товарищу");
             })
             .mouseout(function () {
-                $("#tile_description").empty();
+                $("#menu_status_bar").empty();
             });
-        $('#create_room_button').unbind("click").click(function (event) {
+        $("#username_form_error").empty()
+        $("#lobby_id_form_error").empty()
+        $("#lobby_id").val(msg.id);
+        lobbyID = msg.id;
+        $('#create_room_button').val("Начать игру").text("Начать игру").unbind("click").click(function (event) {
             socket.emit("start", {lobby_id: $("#lobby_id").val(), username: username});
             return false
-        }).show()
+        }).show();
         window.location.hash = "/lobby/" + msg.id
     })
     socket.on("game started", function (msg) {
@@ -115,7 +113,7 @@ $(document).ready(function () {
         }
         $("#game_field").css('display', 'flex');
         $("#game_over").hide();
-        $("#menu").empty()
+        $("#menu").hide()
         $("#log").empty();
         // обработка кнопок управления
         $(document).keydown(function (event) {
