@@ -4,6 +4,41 @@ $(document).ready(function () {
     socket.emit("disconnect from room")
     let username = "";
     let class_ = "";
+    let audio = new Audio("/static/sad.wav");
+    let go = new Audio("/static/go.wav")
+    go.volume = 0.2;
+    let click = new Audio("/static/click.wav")
+    click.volume = 0.2;
+    let magic = new Audio("/static/magic.wav")
+    magic.volume = 0.2;
+    let drop = new Audio("/static/drop.wav")
+    drop.volume = 0.2;
+    let menu = new Audio("/static/heroes.flac")
+    menu.volume = 0.3;
+    let menuCbk = function () {
+        menu.play();
+    }
+    menu.addEventListener("canplaythrough", menuCbk)
+
+    $("#mute").click(function () {
+        console.log("PRESSED")
+        if (audio.muted) {
+            audio.muted = false
+            go.muted = false
+            click.muted = false
+            magic.muted = false
+            drop.muted = false
+            menu.muted = false
+        } else {
+            audio.muted = true
+            go.muted = true
+            click.muted = true
+            magic.muted = true
+            drop.muted = true
+            menu.muted = true
+        }
+    })
+
 
     if (window.chrome) {
         $('#canvas').addClass("chrome_canvas");
@@ -107,6 +142,15 @@ $(document).ready(function () {
         window.location.hash = "/lobby/" + msg.id
     })
     socket.on("game started", function (msg) {
+        menu.removeEventListener("canplaythrough", menuCbk)
+        menu.pause();
+        audio.volume = 0.5;
+        audio.addEventListener("ended", function () {
+            this.currentTime = 0;
+            this.play().then(r => {});
+        })
+        audio.play().then(r => {});
+
         $("#username_form_error").empty()
         if (lobbyID === "") {
             lobbyID = $("#lobby_id").val()
@@ -196,6 +240,8 @@ $(document).ready(function () {
                 }
                 playerState = 'default';
                 console.log(action_type, action)
+                go.currentTime = 0;
+                go.play().then(r => {});
                 socket.emit("move", {
                     username: username,
                     action: [action_type, action],
@@ -271,6 +317,8 @@ $(document).ready(function () {
                 let items = cls.split("_");
                 let i = parseInt(items[items.length - 2]);
                 let j = parseInt(items[items.length - 1]);
+                go.currentTime = 0;
+                go.play().then(r => {});
                 socket.emit("move", {
                     username: username,
                     action: ["on_position_left", i, j],
@@ -286,6 +334,8 @@ $(document).ready(function () {
                 let items = cls.split("_")
                 let i = parseInt(items[items.length - 2]);
                 let j = parseInt(items[items.length - 1]);
+                go.currentTime = 0;
+                go.play().then(r => {})
                 socket.emit("move", {
                     username: username,
                     action: ["on_position_right", i, j],
@@ -313,6 +363,8 @@ $(document).ready(function () {
                 })
                 .click(function () {
                     $("#tile_description").empty();
+                    click.currentTime = 0;
+                    click.play().then(r => {});
                     socket.emit("move", {
                                 username: username,
                                 action: ["equip_or_use", val.name],
@@ -322,6 +374,8 @@ $(document).ready(function () {
                 })
                 .contextmenu(function () {
                     $("#tile_description").empty();
+                    drop.currentTime = 0;
+                    drop.play().then(r => {});
                     socket.emit("move", {
                                 username: username,
                                 action: ["drop_on_world", val.name],
@@ -350,6 +404,8 @@ $(document).ready(function () {
                     })
                     .click(function (event) {
                         $("#tile_description").empty();
+                        drop.currentTime = 0;
+                        drop.play().then(r => {});
                         socket.emit("move", {
                             username: username,
                             action: ["unequip", val.info.name],
@@ -377,6 +433,8 @@ $(document).ready(function () {
                 })
                 .click(function (event) {
                     $("#tile_description").empty();
+                    magic.currentTime = 0;
+                    magic.play().then(r => {});
                     socket.emit("move", {
                         username: username,
                         action: ["magic", val.name],
@@ -402,6 +460,8 @@ $(document).ready(function () {
                     })
                     .click(function (event) {
                         $("#tile_description").empty();
+                        click.currentTime = 0;
+                        click.play().then(r => {});
                         socket.emit("move", {
                             username: username,
                             action: ["trade", val.name, msg.trade_offers.trader_name],
