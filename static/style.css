@@ -94,6 +94,10 @@ body {
     background-color: bisque;
 }
 
+#mute_div {
+    justify-content: center;
+}
+
 
 /* FOOTER */
 
