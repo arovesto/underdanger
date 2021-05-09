@@ -96,6 +96,7 @@ body {
 
 #mute_div {
     justify-content: center;
+    display: flex;
 }
 
 
